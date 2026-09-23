@@ -209,16 +209,19 @@ export default function BooksPage() {
 
     return books.filter((book) => {
       return (
-        book.title
-          .toLowerCase()
-          .includes(query) ||
-        book.fileName
-          .toLowerCase()
-          .includes(query) ||
-        book.fileType
-          .toLowerCase()
-          .includes(query)
-      );
+        (book.fileName ?? "")
+  .toLowerCase()
+  .includes(query) ||
+        const matches =
+  book.title
+    .toLowerCase()
+    .includes(query) ||
+  (book.fileName ?? "")
+    .toLowerCase()
+    .includes(query) ||
+  book.fileType
+    .toLowerCase()
+    .includes(query);
     });
   }, [books, search]);
 

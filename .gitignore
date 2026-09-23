@@ -1,0 +1,27 @@
+# Next.js
+frontend/.next/
+frontend/node_modules/
+frontend/out/
+
+# Python
+backend/__pycache__/
+backend/.venv/
+backend/venv/
+**/__pycache__/
+*.pyc
+
+# Generated audio
+backend/generated_audio/
+generated_audio/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

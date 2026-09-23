@@ -1,0 +1,89 @@
+:root {
+  --color-primary: #7c5cff;
+  --color-primary-hover: #9278ff;
+  --color-secondary: #19d3c5;
+
+  --color-background: #070711;
+  --color-background-light: #0f1020;
+
+  --color-surface: rgba(255, 255, 255, 0.055);
+  --color-surface-hover: rgba(255, 255, 255, 0.085);
+
+  --color-white: #ffffff;
+  --color-text: #f8f8ff;
+  --color-text-secondary: #b8b8ca;
+  --color-text-muted: #77778c;
+
+  --color-success: #32d583;
+  --color-error: #ff5c70;
+  --color-warning: #ffc857;
+
+  --border-color: rgba(255, 255, 255, 0.09);
+  --border-color-light: rgba(255, 255, 255, 0.15);
+
+  --border-radius: 12px;
+  --border-radius-lg: 18px;
+  --border-radius-xl: 24px;
+
+  --space-xs: 5px;
+  --space-sm: 10px;
+  --space-md: 15px;
+  --space-lg: 20px;
+  --space-xl: 30px;
+  --space-2xl: 40px;
+  --space-3xl: 60px;
+
+  --font-family: Inter, Arial, Helvetica, sans-serif;
+
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 28px;
+  --font-size-2xl: 38px;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  --sidebar-width: 250px;
+  --sidebar-width-tablet: 200px;
+
+  --content-max-width: 1250px;
+
+  --shadow-sm: 0 5px 20px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 10px 35px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.4);
+
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+  --transition-slow: 0.4s ease;
+
+  --z-sidebar: 100;
+  --z-header: 200;
+  --z-modal: 1000;
+  --z-tooltip: 2000;
+}
+
+[data-theme="dark"] {
+  --color-background: #070711;
+  --color-background-light: #0f1020;
+  --color-surface: rgba(255, 255, 255, 0.055);
+  --color-surface-hover: rgba(255, 255, 255, 0.085);
+}
+
+[data-theme="light"] {
+  --color-background: #f5f6fb;
+  --color-background-light: #ffffff;
+  --color-surface: rgba(0, 0, 0, 0.04);
+  --color-surface-hover: rgba(0, 0, 0, 0.07);
+
+  --color-text: #11111a;
+  --color-text-secondary: #555568;
+  --color-text-muted: #858595;
+
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-color-light: rgba(0, 0, 0, 0.13);
+}

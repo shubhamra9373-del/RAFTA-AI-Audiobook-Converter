@@ -1,0 +1,117 @@
+/* frontend/src/styles/responsive.css */
+
+@media (max-width: 1200px) {
+  .create-content,
+  .dashboard-content {
+    padding: 30px;
+  }
+
+  .library-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 200px;
+  }
+
+  .create-content,
+  .dashboard-content {
+    margin-left: 200px;
+    padding: 25px;
+  }
+
+  .page-header h1 {
+    font-size: 30px;
+  }
+
+  .create-card {
+    padding: 22px;
+  }
+
+  .dashboard-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .sidebar {
+    position: relative;
+    width: 100%;
+    min-height: auto;
+    padding: 18px;
+  }
+
+  .sidebar-logo {
+    margin-bottom: 20px;
+  }
+
+  .sidebar nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .sidebar nav a {
+    padding: 10px 12px;
+  }
+
+  .create-content,
+  .dashboard-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  .page-header h1 {
+    font-size: 26px;
+  }
+
+  .page-header p {
+    font-size: 14px;
+  }
+
+  .create-card,
+  .audio-result,
+  .settings-panel,
+  .player-container {
+    padding: 18px;
+  }
+
+  .dashboard-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .library-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .create-content,
+  .dashboard-content {
+    padding: 15px;
+  }
+
+  .page-header h1 {
+    font-size: 23px;
+  }
+
+  .form-group textarea {
+    min-height: 130px;
+  }
+
+  .generate-btn,
+  .download-btn,
+  .primary-btn,
+  .secondary-btn {
+    width: 100%;
+  }
+
+  .audio-result > div {
+    flex-direction: column;
+  }
+
+  .sidebar nav a {
+    width: 100%;
+  }
+}

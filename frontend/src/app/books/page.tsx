@@ -13,7 +13,10 @@ import {
   type Audiobook,
 } from "../../components/storage";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://127.0.0.1:8000";
+
 const DEFAULT_VOICE = "en-IN-NeerjaNeural";
 
 interface ChapterProgress {
@@ -208,20 +211,23 @@ export default function BooksPage() {
     }
 
     return books.filter((book) => {
+      const title = String(
+        book.title ?? ""
+      ).toLowerCase();
+
+      const fileName = String(
+        book.fileName ?? ""
+      ).toLowerCase();
+
+      const fileType = String(
+        book.fileType ?? ""
+      ).toLowerCase();
+
       return (
-        (book.fileName ?? "")
-  .toLowerCase()
-  .includes(query) ||
-        const matches =
-  book.title
-    .toLowerCase()
-    .includes(query) ||
-  (book.fileName ?? "")
-    .toLowerCase()
-    .includes(query) ||
-  book.fileType
-    .toLowerCase()
-    .includes(query);
+        title.includes(query) ||
+        fileName.includes(query) ||
+        fileType.includes(query)
+      );
     });
   }, [books, search]);
 
@@ -323,7 +329,8 @@ export default function BooksPage() {
                 ) &&
                 status !==
                   "failed" &&
-                status !== "error"
+                status !==
+                  "error"
               );
             }
           );
@@ -363,17 +370,12 @@ export default function BooksPage() {
                 audioUrl,
                 createdAt:
                   new Date().toISOString(),
-
                 bookId:
                   job.bookId,
-
                 bookTitle:
                   job.bookTitle,
-
                 chapterNumber,
-
                 chapterTitle,
-
                 status:
                   "completed",
               };
@@ -489,13 +491,15 @@ export default function BooksPage() {
           Number(
             data.total_chapters ??
               data.chapter_count ??
+              data.total ??
               chapters.length
           ) ||
           chapters.length;
 
         const completedChapters =
           Number(
-            data.completed_chapters
+            data.completed_chapters ??
+              data.completed
           ) ||
           chapters.filter(
             (chapter) => {
@@ -509,14 +513,16 @@ export default function BooksPage() {
                   "completed" ||
                 status ===
                   "success" ||
-                status === "done"
+                status ===
+                  "done"
               );
             }
           ).length;
 
         const failedChapters =
           Number(
-            data.failed_chapters
+            data.failed_chapters ??
+              data.errors
           ) ||
           chapters.filter(
             (chapter) => {
@@ -528,7 +534,8 @@ export default function BooksPage() {
               return (
                 status ===
                   "failed" ||
-                status === "error"
+                status ===
+                  "error"
               );
             }
           ).length;
@@ -594,10 +601,6 @@ export default function BooksPage() {
           currentJob
         );
 
-        /*
-         * Save any chapter that has
-         * finished since the previous poll.
-         */
         saveCompletedChapters(
           currentJob
         );
@@ -702,7 +705,7 @@ export default function BooksPage() {
       !book.content.trim()
     ) {
       setMessage(
-        `${book.fileType} file has no extracted text available. Please upload it again so RAFTA can extract the text.`
+        `${String(book.fileType ?? "Book")} file has no extracted text available. Please upload it again so RAFTA can extract the text.`
       );
       return;
     }
@@ -724,25 +727,29 @@ export default function BooksPage() {
         await fetch(
           `${API_URL}/api/convert-book`,
           {
-            method: "POST",
+            method:
+              "POST",
             headers: {
               "Content-Type":
                 "application/json",
             },
-            body: JSON.stringify(
-              {
-                text:
-                  book.content.trim(),
+            body:
+              JSON.stringify(
+                {
+                  text:
+                    book.content.trim(),
 
-                book_title:
-                  book.title ||
-                  book.fileName ||
-                  "Untitled Book",
+                  book_title:
+                    String(
+                      book.title ??
+                        book.fileName ??
+                        "Untitled Book"
+                    ),
 
-                voice:
-                  selectedVoice,
-              }
-            ),
+                  voice:
+                    selectedVoice,
+                }
+              ),
           }
         );
 
@@ -786,14 +793,17 @@ export default function BooksPage() {
         Number(
           data.chapter_count ??
             data.total_chapters ??
+            data.total ??
             initialChapters.length
         ) ||
         initialChapters.length;
 
       const bookTitle =
-        book.title ||
-        book.fileName ||
-        "Untitled Book";
+        String(
+          book.title ??
+            book.fileName ??
+            "Untitled Book"
+        );
 
       const initialJob: BookJob =
         {
@@ -804,8 +814,10 @@ export default function BooksPage() {
           voice:
             selectedVoice,
           totalChapters,
-          completedChapters: 0,
-          failedChapters: 0,
+          completedChapters:
+            0,
+          failedChapters:
+            0,
           progress: 0,
           status:
             data.status ||
@@ -875,7 +887,11 @@ export default function BooksPage() {
 
       sessionStorage.setItem(
         "rafta_pending_filename",
-        book.fileName
+        String(
+          book.fileName ??
+            book.title ??
+            "Untitled Book"
+        )
       );
 
       window.location.href =

@@ -42,7 +42,7 @@ ALLOWED_ORIGINS = [
 
 PUBLIC_BASE_URL = os.getenv(
     "PUBLIC_BASE_URL",
-    "http://127.0.0.1:8000"
+    "https://rafta-ai-audiobook-converter.onrender.com"
 ).rstrip("/")
 
 

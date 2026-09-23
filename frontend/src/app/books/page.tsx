@@ -114,7 +114,7 @@ export default function BooksPage() {
      HELPERS
   ===================================================== */
 
-  const formatSize = (bytes: number) => {
+  const formatSize = (bytes?: number) => {
     if (!bytes) {
       return "0 KB";
     }

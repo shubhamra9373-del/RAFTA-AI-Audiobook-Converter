@@ -183,10 +183,10 @@ export default function UploadPage() {
       const existingBooks = getBooks();
 
       const alreadyExists = existingBooks.some(
-        (book) =>
-          book.fileName.toLowerCase() ===
-          selectedFile.name.toLowerCase()
-      );
+  (book) =>
+    book.fileName?.toLowerCase() ===
+    selectedFile.name.toLowerCase()
+);
 
       if (alreadyExists) {
         setMessage(

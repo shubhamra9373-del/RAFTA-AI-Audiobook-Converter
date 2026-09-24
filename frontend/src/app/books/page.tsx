@@ -14,8 +14,7 @@ import {
 } from "../../components/storage";
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://127.0.0.1:8000";
+  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
 const DEFAULT_VOICE = "en-IN-NeerjaNeural";
 
@@ -46,33 +45,19 @@ export default function BooksPage() {
   const [books, setBooks] = useState<SavedBook[]>([]);
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("");
-
-  const [selectedVoice, setSelectedVoice] =
-    useState(DEFAULT_VOICE);
-
-  const [activeJob, setActiveJob] =
-    useState<BookJob | null>(null);
-
-  const [generatingBookId, setGeneratingBookId] =
-    useState<string | null>(null);
-
-  /* =====================================================
-     LOAD BOOKS
-  ===================================================== */
+  const [selectedVoice, setSelectedVoice] = useState(DEFAULT_VOICE);
+  const [activeJob, setActiveJob] = useState<BookJob | null>(null);
+  const [generatingBookId, setGeneratingBookId] = useState<string | null>(
+    null
+  );
 
   const loadBooks = () => {
     try {
       setBooks(getBooks());
     } catch (error) {
-      console.error(
-        "Library load error:",
-        error
-      );
-
+      console.error("Library load error:", error);
       setBooks([]);
-      setMessage(
-        "Unable to load your books."
-      );
+      setMessage("Unable to load your books.");
     }
   };
 
@@ -87,32 +72,14 @@ export default function BooksPage() {
       loadBooks();
     };
 
-    window.addEventListener(
-      "storage",
-      handleStorageChange
-    );
-
-    window.addEventListener(
-      "focus",
-      handleFocus
-    );
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("focus", handleFocus);
 
     return () => {
-      window.removeEventListener(
-        "storage",
-        handleStorageChange
-      );
-
-      window.removeEventListener(
-        "focus",
-        handleFocus
-      );
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("focus", handleFocus);
     };
   }, []);
-
-  /* =====================================================
-     HELPERS
-  ===================================================== */
 
   const formatSize = (bytes?: number) => {
     if (!bytes) {
@@ -134,30 +101,21 @@ export default function BooksPage() {
     try {
       const parsedDate = new Date(date);
 
-      if (
-        Number.isNaN(
-          parsedDate.getTime()
-        )
-      ) {
+      if (Number.isNaN(parsedDate.getTime())) {
         return "Unknown date";
       }
 
-      return parsedDate.toLocaleDateString(
-        undefined,
-        {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        }
-      );
+      return parsedDate.toLocaleDateString(undefined, {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
     } catch {
       return "Unknown date";
     }
   };
 
-  const normalizeAudioUrl = (
-    url: string
-  ) => {
+  const normalizeAudioUrl = (url: string) => {
     if (!url) {
       return "";
     }
@@ -173,9 +131,7 @@ export default function BooksPage() {
     chapter: ChapterProgress,
     fallback: number
   ) => {
-    const number =
-      chapter.chapter_number ??
-      chapter.number;
+    const number = chapter.chapter_number ?? chapter.number;
 
     if (
       typeof number === "number" &&
@@ -198,30 +154,17 @@ export default function BooksPage() {
     );
   };
 
-  /* =====================================================
-     SEARCH
-  ===================================================== */
-
   const filteredBooks = useMemo(() => {
-    const query =
-      search.trim().toLowerCase();
+    const query = search.trim().toLowerCase();
 
     if (!query) {
       return books;
     }
 
     return books.filter((book) => {
-      const title = String(
-        book.title ?? ""
-      ).toLowerCase();
-
-      const fileName = String(
-        book.fileName ?? ""
-      ).toLowerCase();
-
-      const fileType = String(
-        book.fileType ?? ""
-      ).toLowerCase();
+      const title = String(book.title ?? "").toLowerCase();
+      const fileName = String(book.fileName ?? "").toLowerCase();
+      const fileType = String(book.fileType ?? "").toLowerCase();
 
       return (
         title.includes(query) ||
@@ -231,46 +174,30 @@ export default function BooksPage() {
     });
   }, [books, search]);
 
-  /* =====================================================
-     DELETE BOOK
-  ===================================================== */
-
   const deleteBook = (id: string) => {
-    const confirmed =
-      window.confirm(
-        "Do you want to remove this book from your library?"
-      );
+    const confirmed = window.confirm(
+      "Do you want to remove this book from your library?"
+    );
 
     if (!confirmed) {
       return;
     }
 
-    const updated =
-      books.filter(
-        (book) => book.id !== id
-      );
+    const updated = books.filter((book) => book.id !== id);
 
     setBooks(updated);
     saveBooks(updated);
-
-    setMessage(
-      "Book removed from your library."
-    );
+    setMessage("Book removed from your library.");
   };
-
-  /* =====================================================
-     CLEAR BOOKS
-  ===================================================== */
 
   const clearAllBooks = () => {
     if (books.length === 0) {
       return;
     }
 
-    const confirmed =
-      window.confirm(
-        "Do you want to remove all books from your library?"
-      );
+    const confirmed = window.confirm(
+      "Do you want to remove all books from your library?"
+    );
 
     if (!confirmed) {
       return;
@@ -278,157 +205,95 @@ export default function BooksPage() {
 
     saveBooks([]);
     setBooks([]);
-
-    setMessage(
-      "All books have been removed."
-    );
+    setMessage("All books have been removed.");
   };
 
-  /* =====================================================
-     SAVE COMPLETED CHAPTERS
-  ===================================================== */
-
-  const saveCompletedChapters = (
-    job: BookJob
-  ) => {
+  const saveCompletedChapters = (job: BookJob) => {
     try {
-      const existing =
-        getAudiobooks();
+      const existing = getAudiobooks();
 
-      const completed =
-        job.chapters
-          .map(
-            (
-              chapter,
-              index
-            ) => {
-              const chapterNumber =
-                getChapterNumber(
-                  chapter,
-                  index + 1
-                );
-
-              return {
-                chapter,
-                chapterNumber,
-              };
-            }
-          )
-          .filter(
-            ({
-              chapter,
-            }) => {
-              const status =
-                chapter.status
-                  ?.toLowerCase() ||
-                "";
-
-              return (
-                Boolean(
-                  chapter.audio_url
-                ) &&
-                status !==
-                  "failed" &&
-                status !==
-                  "error"
-              );
-            }
+      const completed = job.chapters
+        .map((chapter, index) => {
+          const chapterNumber = getChapterNumber(
+            chapter,
+            index + 1
           );
 
-      if (
-        completed.length === 0
-      ) {
+          return {
+            chapter,
+            chapterNumber,
+          };
+        })
+        .filter(({ chapter }) => {
+          const status =
+            chapter.status?.toLowerCase() || "";
+
+          return (
+            Boolean(chapter.audio_url) &&
+            status !== "failed" &&
+            status !== "error"
+          );
+        });
+
+      if (completed.length === 0) {
         return;
       }
 
-      const generated =
-        completed.map(
-          ({
+      const generated = completed.map(
+        ({ chapter, chapterNumber }) => {
+          const chapterTitle = getChapterTitle(
             chapter,
+            chapterNumber
+          );
+
+          const audioUrl = normalizeAudioUrl(
+            chapter.audio_url || ""
+          );
+
+          const id = `${job.jobId}-chapter-${chapterNumber}`;
+
+          const audiobook: Audiobook = {
+            id,
+            title: `${job.bookTitle} — ${chapterTitle}`,
+            voice: job.voice,
+            audioUrl,
+            createdAt: new Date().toISOString(),
+            bookId: job.bookId,
+            bookTitle: job.bookTitle,
             chapterNumber,
-          }) => {
-            const chapterTitle =
-              getChapterTitle(
-                chapter,
-                chapterNumber
-              );
+            chapterTitle,
+            status: "completed",
+          };
 
-            const audioUrl =
-              normalizeAudioUrl(
-                chapter.audio_url ||
-                  ""
-              );
+          return audiobook;
+        }
+      );
 
-            const id =
-              `${job.jobId}-chapter-${chapterNumber}`;
+      const generatedMap = new Map(
+        generated.map((audio) => [
+          audio.id,
+          audio,
+        ])
+      );
 
-            const audiobook: Audiobook =
-              {
-                id,
-                title: `${job.bookTitle} — ${chapterTitle}`,
-                voice: job.voice,
-                audioUrl,
-                createdAt:
-                  new Date().toISOString(),
-                bookId:
-                  job.bookId,
-                bookTitle:
-                  job.bookTitle,
-                chapterNumber,
-                chapterTitle,
-                status:
-                  "completed",
-              };
+      const existingIds = new Set(
+        generated.map((audio) => audio.id)
+      );
 
-            return audiobook;
-          }
-        );
+      const updatedExisting = existing.map((audio) => {
+        if (!existingIds.has(audio.id)) {
+          return audio;
+        }
 
-      const generatedMap =
-        new Map(
-          generated.map(
-            (audio) => [
-              audio.id,
-              audio,
-            ]
+        return generatedMap.get(audio.id) || audio;
+      });
+
+      const newAudio = generated.filter(
+        (audio) =>
+          !existing.some(
+            (item) => item.id === audio.id
           )
-        );
-
-      const existingIds =
-        new Set(
-          generated.map(
-            (audio) => audio.id
-          )
-        );
-
-      const updatedExisting =
-        existing.map(
-          (audio) => {
-            if (
-              !existingIds.has(
-                audio.id
-              )
-            ) {
-              return audio;
-            }
-
-            return (
-              generatedMap.get(
-                audio.id
-              ) || audio
-            );
-          }
-        );
-
-      const newAudio =
-        generated.filter(
-          (audio) =>
-            !existing.some(
-              (item) =>
-                item.id ===
-                audio.id
-            )
-        );
+      );
 
       const updated = [
         ...newAudio,
@@ -438,9 +303,7 @@ export default function BooksPage() {
       saveAudiobooks(updated);
 
       window.dispatchEvent(
-        new Event(
-          "rafta-audiobooks-updated"
-        )
+        new Event("rafta-audiobooks-updated")
       );
     } catch (error) {
       console.error(
@@ -450,10 +313,6 @@ export default function BooksPage() {
     }
   };
 
-  /* =====================================================
-     POLL GENERATION
-  ===================================================== */
-
   const pollJob = useCallback(
     async (
       jobId: string,
@@ -462,14 +321,12 @@ export default function BooksPage() {
       voice: string
     ) => {
       try {
-        const response =
-          await fetch(
-            `${API_URL}/api/convert-book/${jobId}`,
-            {
-              cache:
-                "no-store",
-            }
-          );
+        const response = await fetch(
+          `${API_URL}/api/convert-book/${jobId}`,
+          {
+            cache: "no-store",
+          }
+        );
 
         if (!response.ok) {
           throw new Error(
@@ -477,13 +334,10 @@ export default function BooksPage() {
           );
         }
 
-        const data =
-          await response.json();
+        const data = await response.json();
 
         const chapters: ChapterProgress[] =
-          Array.isArray(
-            data.chapters
-          )
+          Array.isArray(data.chapters)
             ? data.chapters
             : [];
 
@@ -493,63 +347,44 @@ export default function BooksPage() {
               data.chapter_count ??
               data.total ??
               chapters.length
-          ) ||
-          chapters.length;
+          ) || chapters.length;
 
         const completedChapters =
           Number(
             data.completed_chapters ??
               data.completed
           ) ||
-          chapters.filter(
-            (chapter) => {
-              const status =
-                chapter.status
-                  ?.toLowerCase() ||
-                "";
+          chapters.filter((chapter) => {
+            const status =
+              chapter.status?.toLowerCase() ||
+              "";
 
-              return (
-                status ===
-                  "completed" ||
-                status ===
-                  "success" ||
-                status ===
-                  "done"
-              );
-            }
-          ).length;
+            return (
+              status === "completed" ||
+              status === "success" ||
+              status === "done"
+            );
+          }).length;
 
         const failedChapters =
           Number(
             data.failed_chapters ??
               data.errors
           ) ||
-          chapters.filter(
-            (chapter) => {
-              const status =
-                chapter.status
-                  ?.toLowerCase() ||
-                "";
+          chapters.filter((chapter) => {
+            const status =
+              chapter.status?.toLowerCase() ||
+              "";
 
-              return (
-                status ===
-                  "failed" ||
-                status ===
-                  "error"
-              );
-            }
-          ).length;
+            return (
+              status === "failed" ||
+              status === "error"
+            );
+          }).length;
 
-        let progress =
-          Number(
-            data.progress
-          );
+        let progress = Number(data.progress);
 
-        if (
-          !Number.isFinite(
-            progress
-          )
-        ) {
+        if (!Number.isFinite(progress)) {
           progress =
             totalChapters > 0
               ? Math.round(
@@ -560,69 +395,44 @@ export default function BooksPage() {
               : 0;
         }
 
-        if (
-          progress > 0 &&
-          progress <= 1
-        ) {
-          progress =
-            Math.round(
-              progress * 100
-            );
+        if (progress > 0 && progress <= 1) {
+          progress = Math.round(progress * 100);
         }
 
-        progress =
-          Math.max(
-            0,
-            Math.min(
-              100,
-              Math.round(
-                progress
-              )
-            )
-          );
-
-        const currentJob: BookJob =
-          {
-            jobId,
-            bookId,
-            bookTitle,
-            voice,
-            totalChapters,
-            completedChapters,
-            failedChapters,
-            progress,
-            status:
-              data.status ||
-              "processing",
-            chapters,
-          };
-
-        setActiveJob(
-          currentJob
+        progress = Math.max(
+          0,
+          Math.min(100, Math.round(progress))
         );
 
-        saveCompletedChapters(
-          currentJob
-        );
+        const currentJob: BookJob = {
+          jobId,
+          bookId,
+          bookTitle,
+          voice,
+          totalChapters,
+          completedChapters,
+          failedChapters,
+          progress,
+          status:
+            data.status || "processing",
+          chapters,
+        };
 
-        const status =
-          String(
-            data.status ||
-              ""
-          ).toLowerCase();
+        setActiveJob(currentJob);
+
+        saveCompletedChapters(currentJob);
+
+        const status = String(
+          data.status || ""
+        ).toLowerCase();
 
         const finished =
-          status ===
-            "completed" ||
-          status ===
-            "completed_with_errors" ||
-          status ===
-            "failed";
+          status === "completed" ||
+          status === "completed_with_errors" ||
+          status === "failed";
 
         if (finished) {
-          setGeneratingBookId(
-            null
-          );
+          setGeneratingBookId(null);
 
           if (
             status ===
@@ -635,10 +445,7 @@ export default function BooksPage() {
                   : "s"
               } completed and ${failedChapters} failed.`
             );
-          } else if (
-            status ===
-            "failed"
-          ) {
+          } else if (status === "failed") {
             setMessage(
               "Audiobook generation failed."
             );
@@ -655,26 +462,21 @@ export default function BooksPage() {
           return;
         }
 
-        window.setTimeout(
-          () => {
-            pollJob(
-              jobId,
-              bookId,
-              bookTitle,
-              voice
-            );
-          },
-          1000
-        );
+        window.setTimeout(() => {
+          pollJob(
+            jobId,
+            bookId,
+            bookTitle,
+            voice
+          );
+        }, 1000);
       } catch (error) {
         console.error(
           "Generation polling error:",
           error
         );
 
-        setGeneratingBookId(
-          null
-        );
+        setGeneratingBookId(null);
 
         setMessage(
           error instanceof Error
@@ -686,13 +488,7 @@ export default function BooksPage() {
     []
   );
 
-  /* =====================================================
-     START GENERATION
-  ===================================================== */
-
-  const generateBook = async (
-    book: SavedBook
-  ) => {
+  const generateBook = async (book: SavedBook) => {
     if (generatingBookId) {
       setMessage(
         "Another audiobook is currently being generated."
@@ -700,66 +496,48 @@ export default function BooksPage() {
       return;
     }
 
-    if (
-      !book.content ||
-      !book.content.trim()
-    ) {
+    if (!book.content || !book.content.trim()) {
       setMessage(
-        `${String(book.fileType ?? "Book")} file has no extracted text available. Please upload it again so RAFTA can extract the text.`
+        `${String(
+          book.fileType ?? "Book"
+        )} file has no extracted text available. Please upload it again so RAFTA can extract the text.`
       );
       return;
     }
 
     try {
-      setGeneratingBookId(
-        book.id
-      );
-
-      setActiveJob(
-        null
-      );
+      setGeneratingBookId(book.id);
+      setActiveJob(null);
 
       setMessage(
         "Starting audiobook generation..."
       );
 
-      const response =
-        await fetch(
-          `${API_URL}/api/convert-book`,
-          {
-            method:
-              "POST",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            body:
-              JSON.stringify(
-                {
-                  text:
-                    book.content.trim(),
-
-                  book_title:
-                    String(
-                      book.title ??
-                        book.fileName ??
-                        "Untitled Book"
-                    ),
-
-                  voice:
-                    selectedVoice,
-                }
-              ),
-          }
-        );
+      const response = await fetch(
+        `${API_URL}/api/convert-book`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            text: book.content.trim(),
+            book_title: String(
+              book.title ??
+                book.fileName ??
+                "Untitled Book"
+            ),
+            voice: selectedVoice,
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData =
           await response
             .json()
-            .catch(
-              () => null
-            );
+            .catch(() => null);
 
         throw new Error(
           errorData?.detail ||
@@ -768,8 +546,7 @@ export default function BooksPage() {
         );
       }
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
       const jobId =
         data.job_id ||
@@ -782,10 +559,9 @@ export default function BooksPage() {
         );
       }
 
-      const initialChapters: ChapterProgress[] =
-        Array.isArray(
-          data.chapters
-        )
+      const initialChapters:
+        ChapterProgress[] =
+        Array.isArray(data.chapters)
           ? data.chapters
           : [];
 
@@ -798,37 +574,27 @@ export default function BooksPage() {
         ) ||
         initialChapters.length;
 
-      const bookTitle =
-        String(
-          book.title ??
-            book.fileName ??
-            "Untitled Book"
-        );
-
-      const initialJob: BookJob =
-        {
-          jobId,
-          bookId:
-            book.id,
-          bookTitle,
-          voice:
-            selectedVoice,
-          totalChapters,
-          completedChapters:
-            0,
-          failedChapters:
-            0,
-          progress: 0,
-          status:
-            data.status ||
-            "processing",
-          chapters:
-            initialChapters,
-        };
-
-      setActiveJob(
-        initialJob
+      const bookTitle = String(
+        book.title ??
+          book.fileName ??
+          "Untitled Book"
       );
+
+      const initialJob: BookJob = {
+        jobId,
+        bookId: book.id,
+        bookTitle,
+        voice: selectedVoice,
+        totalChapters,
+        completedChapters: 0,
+        failedChapters: 0,
+        progress: 0,
+        status:
+          data.status || "processing",
+        chapters: initialChapters,
+      };
+
+      setActiveJob(initialJob);
 
       setMessage(
         `Generation started. RAFTA detected ${totalChapters} chapter${
@@ -850,9 +616,7 @@ export default function BooksPage() {
         error
       );
 
-      setGeneratingBookId(
-        null
-      );
+      setGeneratingBookId(null);
 
       setMessage(
         error instanceof Error
@@ -862,17 +626,8 @@ export default function BooksPage() {
     }
   };
 
-  /* =====================================================
-     OPEN CREATE PAGE
-  ===================================================== */
-
-  const openGeneratePage = (
-    book: SavedBook
-  ) => {
-    if (
-      !book.content ||
-      !book.content.trim()
-    ) {
+  const openGeneratePage = (book: SavedBook) => {
+    if (!book.content || !book.content.trim()) {
       setMessage(
         "This book does not contain extracted text."
       );
@@ -894,8 +649,7 @@ export default function BooksPage() {
         )
       );
 
-      window.location.href =
-        "/create";
+      window.location.href = "/create";
     } catch (error) {
       console.error(
         "Failed to prepare book:",
@@ -908,10 +662,6 @@ export default function BooksPage() {
     }
   };
 
-  /* =====================================================
-     JOB STATUS
-  ===================================================== */
-
   const getJobStatusText = () => {
     if (!activeJob) {
       return "";
@@ -920,9 +670,7 @@ export default function BooksPage() {
     const status =
       activeJob.status.toLowerCase();
 
-    if (
-      status === "completed"
-    ) {
+    if (status === "completed") {
       return "Completed";
     }
 
@@ -933,33 +681,21 @@ export default function BooksPage() {
       return "Completed with errors";
     }
 
-    if (
-      status === "failed"
-    ) {
+    if (status === "failed") {
       return "Generation failed";
     }
 
-    if (
-      activeJob.totalChapters >
-      0
-    ) {
+    if (activeJob.totalChapters > 0) {
       return `Generating chapter ${
         Math.min(
-          activeJob.completedChapters +
-            1,
+          activeJob.completedChapters + 1,
           activeJob.totalChapters
         )
-      } of ${
-        activeJob.totalChapters
-      }`;
+      } of ${activeJob.totalChapters}`;
     }
 
     return "Detecting chapters...";
   };
-
-  /* =====================================================
-     TEXT STATUS
-  ===================================================== */
 
   const getReadableTextStatus = (
     book: SavedBook
@@ -974,10 +710,6 @@ export default function BooksPage() {
     return "Text unavailable";
   };
 
-  /* =====================================================
-     UI
-  ===================================================== */
-
   return (
     <AuthGuard>
       <main className="books-page">
@@ -987,20 +719,12 @@ export default function BooksPage() {
           <header className="books-header">
             <div>
               <div className="breadcrumb">
-                <span>
-                  RAFTA
-                </span>
-
+                <span>RAFTA</span>
                 <b>/</b>
-
-                <span>
-                  Library
-                </span>
+                <span>Library</span>
               </div>
 
-              <h1>
-                Book Library
-              </h1>
+              <h1>Book Library</h1>
 
               <p>
                 Your uploaded books are
@@ -1018,22 +742,17 @@ export default function BooksPage() {
                 ↑ Upload Book
               </Link>
 
-              {books.length >
-                0 && (
+              {books.length > 0 && (
                 <button
                   type="button"
                   className="books-clear-btn"
-                  onClick={
-                    clearAllBooks
-                  }
+                  onClick={clearAllBooks}
                 >
                   🗑 Clear
                 </button>
               )}
             </div>
           </header>
-
-          {/* STATS */}
 
           <section className="books-stats">
             <div className="books-stat-card">
@@ -1042,9 +761,7 @@ export default function BooksPage() {
               </div>
 
               <div>
-                <span>
-                  TOTAL BOOKS
-                </span>
+                <span>TOTAL BOOKS</span>
 
                 <strong>
                   {books.length}
@@ -1062,9 +779,7 @@ export default function BooksPage() {
               </div>
 
               <div>
-                <span>
-                  TXT
-                </span>
+                <span>TXT</span>
 
                 <strong>
                   {
@@ -1088,20 +803,14 @@ export default function BooksPage() {
               </div>
 
               <div>
-                <span>
-                  STORAGE
-                </span>
+                <span>STORAGE</span>
 
                 <strong>
                   {formatSize(
                     books.reduce(
-                      (
-                        total,
-                        book
-                      ) =>
+                      (total, book) =>
                         total +
-                        (book.size ||
-                          0),
+                        (book.size || 0),
                       0
                     )
                   )}
@@ -1114,23 +823,16 @@ export default function BooksPage() {
             </div>
           </section>
 
-          {/* TOOLBAR */}
-
           <section className="books-toolbar">
             <div className="books-search">
-              <span>
-                ⌕
-              </span>
+              <span>⌕</span>
 
               <input
                 type="text"
                 value={search}
-                onChange={(
-                  event
-                ) =>
+                onChange={(event) =>
                   setSearch(
-                    event.target
-                      .value
+                    event.target.value
                   )
                 }
                 placeholder="Search books..."
@@ -1139,22 +841,17 @@ export default function BooksPage() {
 
             <div
               style={{
-                display:
-                  "flex",
-                alignItems:
-                  "center",
+                display: "flex",
+                alignItems: "center",
                 gap: "10px",
-                flexWrap:
-                  "wrap",
+                flexWrap: "wrap",
               }}
             >
               <label
                 htmlFor="book-voice"
                 style={{
-                  fontSize:
-                    "12px",
-                  opacity:
-                    0.7,
+                  fontSize: "12px",
+                  opacity: 0.7,
                 }}
               >
                 Voice
@@ -1162,31 +859,22 @@ export default function BooksPage() {
 
               <select
                 id="book-voice"
-                value={
-                  selectedVoice
-                }
-                onChange={(
-                  event
-                ) =>
+                value={selectedVoice}
+                onChange={(event) =>
                   setSelectedVoice(
-                    event.target
-                      .value
+                    event.target.value
                   )
                 }
                 disabled={
                   !!generatingBookId
                 }
                 style={{
-                  minHeight:
-                    "40px",
-                  padding:
-                    "0 12px",
-                  borderRadius:
-                    "10px",
+                  minHeight: "40px",
+                  padding: "0 12px",
+                  borderRadius: "10px",
                   background:
                     "rgba(255,255,255,0.05)",
-                  color:
-                    "inherit",
+                  color: "inherit",
                   border:
                     "1px solid rgba(255,255,255,0.12)",
                 }}
@@ -1201,29 +889,20 @@ export default function BooksPage() {
               </select>
 
               <span className="books-count">
-                {
-                  filteredBooks.length
-                }{" "}
+                {filteredBooks.length}{" "}
                 book
-                {filteredBooks.length ===
-                1
+                {filteredBooks.length === 1
                   ? ""
                   : "s"}
               </span>
             </div>
           </section>
 
-          {/* MESSAGE */}
-
           {message && (
             <div className="books-message">
-              <span>
-                i
-              </span>
+              <span>i</span>
 
-              <p>
-                {message}
-              </p>
+              <p>{message}</p>
 
               <button
                 type="button"
@@ -1236,17 +915,12 @@ export default function BooksPage() {
             </div>
           )}
 
-          {/* GENERATION PROGRESS */}
-
           {activeJob && (
             <section
               style={{
-                marginBottom:
-                  "24px",
-                padding:
-                  "22px",
-                borderRadius:
-                  "16px",
+                marginBottom: "24px",
+                padding: "22px",
+                borderRadius: "16px",
                 border:
                   "1px solid rgba(124,77,255,0.25)",
                 background:
@@ -1255,32 +929,25 @@ export default function BooksPage() {
             >
               <div
                 style={{
-                  display:
-                    "flex",
+                  display: "flex",
                   justifyContent:
                     "space-between",
                   gap: "16px",
                   alignItems:
                     "flex-start",
-                  marginBottom:
-                    "14px",
-                  flexWrap:
-                    "wrap",
+                  marginBottom: "14px",
+                  flexWrap: "wrap",
                 }}
               >
                 <div>
                   <span
                     style={{
-                      display:
-                        "block",
-                      fontSize:
-                        "11px",
+                      display: "block",
+                      fontSize: "11px",
                       letterSpacing:
                         "0.12em",
-                      opacity:
-                        0.6,
-                      marginBottom:
-                        "6px",
+                      opacity: 0.6,
+                      marginBottom: "6px",
                     }}
                   >
                     AUDIOBOOK GENERATION
@@ -1289,52 +956,37 @@ export default function BooksPage() {
                   <h2
                     style={{
                       margin: 0,
-                      fontSize:
-                        "20px",
+                      fontSize: "20px",
                     }}
                   >
-                    {
-                      activeJob.bookTitle
-                    }
+                    {activeJob.bookTitle}
                   </h2>
 
                   <p
                     style={{
-                      margin:
-                        "7px 0 0",
-                      opacity:
-                        0.7,
+                      margin: "7px 0 0",
+                      opacity: 0.7,
                     }}
                   >
-                    {
-                      getJobStatusText()
-                    }
+                    {getJobStatusText()}
                   </p>
                 </div>
 
                 <strong
                   style={{
-                    fontSize:
-                      "22px",
+                    fontSize: "22px",
                   }}
                 >
-                  {
-                    activeJob.progress
-                  }
-                  %
+                  {activeJob.progress}%
                 </strong>
               </div>
 
               <div
                 style={{
-                  width:
-                    "100%",
-                  height:
-                    "9px",
-                  borderRadius:
-                    "999px",
-                  overflow:
-                    "hidden",
+                  width: "100%",
+                  height: "9px",
+                  borderRadius: "999px",
+                  overflow: "hidden",
                   background:
                     "rgba(255,255,255,0.08)",
                 }}
@@ -1342,10 +994,8 @@ export default function BooksPage() {
                 <div
                   style={{
                     width: `${activeJob.progress}%`,
-                    height:
-                      "100%",
-                    borderRadius:
-                      "999px",
+                    height: "100%",
+                    borderRadius: "999px",
                     background:
                       "linear-gradient(90deg,#7c4dff,#a855f7)",
                     transition:
@@ -1356,20 +1006,14 @@ export default function BooksPage() {
 
               <div
                 style={{
-                  display:
-                    "flex",
+                  display: "flex",
                   justifyContent:
                     "space-between",
-                  marginTop:
-                    "12px",
-                  fontSize:
-                    "13px",
-                  opacity:
-                    0.75,
-                  gap:
-                    "10px",
-                  flexWrap:
-                    "wrap",
+                  marginTop: "12px",
+                  fontSize: "13px",
+                  opacity: 0.75,
+                  gap: "10px",
+                  flexWrap: "wrap",
                 }}
               >
                 <span>
@@ -1399,33 +1043,23 @@ export default function BooksPage() {
                 )}
               </div>
 
-              {activeJob.chapters
-                .length >
+              {activeJob.chapters.length >
                 0 && (
                 <div
                   style={{
-                    marginTop:
-                      "18px",
-                    display:
-                      "grid",
-                    gap:
-                      "7px",
-                    maxHeight:
-                      "300px",
-                    overflowY:
-                      "auto",
+                    marginTop: "18px",
+                    display: "grid",
+                    gap: "7px",
+                    maxHeight: "300px",
+                    overflowY: "auto",
                   }}
                 >
                   {activeJob.chapters.map(
-                    (
-                      chapter,
-                      index
-                    ) => {
+                    (chapter, index) => {
                       const number =
                         getChapterNumber(
                           chapter,
-                          index +
-                            1
+                          index + 1
                         );
 
                       const status =
@@ -1437,33 +1071,28 @@ export default function BooksPage() {
                           "completed" ||
                         status ===
                           "success" ||
-                        status ===
-                          "done";
+                        status === "done";
 
                       const failed =
                         status ===
                           "failed" ||
-                        status ===
-                          "error";
+                        status === "error";
 
                       return (
                         <div
                           key={`${activeJob.jobId}-${number}`}
                           style={{
-                            display:
-                              "flex",
+                            display: "flex",
                             alignItems:
                               "center",
-                            gap:
-                              "10px",
+                            gap: "10px",
                             padding:
                               "9px 12px",
                             borderRadius:
                               "9px",
                             background:
                               "rgba(255,255,255,0.035)",
-                            fontSize:
-                              "13px",
+                            fontSize: "13px",
                           }}
                         >
                           <span>
@@ -1479,16 +1108,11 @@ export default function BooksPage() {
 
                           <span
                             style={{
-                              flex:
-                                1,
-                              minWidth:
-                                0,
+                              flex: 1,
+                              minWidth: 0,
                             }}
                           >
-                            Chapter{" "}
-                            {
-                              number
-                            }
+                            Chapter {number}
                             {chapter.title
                               ? ` — ${chapter.title}`
                               : ""}
@@ -1496,17 +1120,13 @@ export default function BooksPage() {
 
                           <span
                             style={{
-                              opacity:
-                                0.55,
-                              fontSize:
-                                "11px",
+                              opacity: 0.55,
+                              fontSize: "11px",
                               textTransform:
                                 "capitalize",
                             }}
                           >
-                            {
-                              status
-                            }
+                            {status}
                           </span>
                         </div>
                       );
@@ -1524,12 +1144,9 @@ export default function BooksPage() {
                 !generatingBookId && (
                   <div
                     style={{
-                      marginTop:
-                        "16px",
-                      display:
-                        "flex",
-                      gap:
-                        "10px",
+                      marginTop: "16px",
+                      display: "flex",
+                      gap: "10px",
                       flexWrap:
                         "wrap",
                     }}
@@ -1538,16 +1155,15 @@ export default function BooksPage() {
                       href="/library"
                       className="books-details-btn"
                     >
-                      🎧 Open Generated Audio
+                      🎧 Open Generated
+                      Audio
                     </Link>
 
                     <button
                       type="button"
                       className="books-details-btn"
                       onClick={() =>
-                        setActiveJob(
-                          null
-                        )
+                        setActiveJob(null)
                       }
                     >
                       Close
@@ -1557,10 +1173,7 @@ export default function BooksPage() {
             </section>
           )}
 
-          {/* EMPTY */}
-
-          {books.length ===
-          0 ? (
+          {books.length === 0 ? (
             <section className="books-empty">
               <div className="books-empty-icon">
                 📚
@@ -1570,9 +1183,7 @@ export default function BooksPage() {
                 BOOK LIBRARY
               </div>
 
-              <h2>
-                No Books Yet
-              </h2>
+              <h2>No Books Yet</h2>
 
               <p>
                 Upload your first
@@ -1600,18 +1211,15 @@ export default function BooksPage() {
           ) : filteredBooks.length ===
             0 ? (
             <section className="books-no-results">
-              <div>
-                ⌕
-              </div>
+              <div>⌕</div>
 
               <h2>
-                No Matching
-                Books
+                No Matching Books
               </h2>
 
               <p>
-                Nothing matches "
-                {search}".
+                Nothing matches
+                "{search}".
               </p>
 
               <button
@@ -1633,9 +1241,7 @@ export default function BooksPage() {
 
                   return (
                     <article
-                      key={
-                        book.id
-                      }
+                      key={book.id}
                       className="books-card"
                     >
                       <div className="books-cover">
@@ -1648,15 +1254,11 @@ export default function BooksPage() {
                         </small>
 
                         <strong>
-                          {
-                            book.title
-                          }
+                          {book.title}
                         </strong>
 
                         <span className="books-cover-type">
-                          {
-                            book.fileType
-                          }
+                          {book.fileType}
                         </span>
                       </div>
 
@@ -1664,15 +1266,11 @@ export default function BooksPage() {
                         <div className="books-card-top">
                           <div>
                             <span className="books-file-badge">
-                              {
-                                book.fileType
-                              }
+                              {book.fileType}
                             </span>
 
                             <h2>
-                              {
-                                book.title
-                              }
+                              {book.title}
                             </h2>
                           </div>
 
@@ -1693,15 +1291,14 @@ export default function BooksPage() {
                         </div>
 
                         <p className="books-file-name">
-                          {
-                            book.fileName
-                          }
+                          {book.fileName}
                         </p>
 
                         <div className="books-metadata">
                           <span>
                             {formatSize(
-                              book.size
+                              book.size ??
+                                0
                             )}
                           </span>
 
@@ -1718,7 +1315,7 @@ export default function BooksPage() {
                           </span>
                         </div>
 
-                        <div className="books-card-divider"></div>
+                        <div className="books-card-divider" />
 
                         <div className="books-card-actions">
                           <button
@@ -1767,8 +1364,6 @@ export default function BooksPage() {
             </section>
           )}
 
-          {/* SEPARATION */}
-
           <section className="books-separation-card">
             <div className="books-separation-icon">
               ⇄
@@ -1799,16 +1394,12 @@ export default function BooksPage() {
             </Link>
           </section>
 
-          {/* FOOTER */}
-
           <footer className="books-footer">
-            <span>
-              RAFTA AI
-            </span>
+            <span>RAFTA AI</span>
 
             <p>
-              Book Library ·
-              Upload · Generate
+              Book Library · Upload ·
+              Generate
             </p>
           </footer>
         </section>

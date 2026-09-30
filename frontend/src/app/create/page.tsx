@@ -11,8 +11,17 @@ import {
   type Audiobook,
 } from "../../components/storage";
 
+const LOCAL_API_URL = "http://127.0.0.1:8000";
+const PUBLIC_API_URL =
+  "https://rafta-ai-audiobook-converter.onrender.com";
+
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
+  (typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1")
+    ? LOCAL_API_URL
+    : PUBLIC_API_URL);
 
 interface VoiceOption {
   value: string;
@@ -498,13 +507,23 @@ export default function CreatePage() {
 
         formData.append("file", file);
 
-        const response = await fetch(
-          `${API_URL}/api/extract`,
-          {
+        let response: Response;
+
+        try {
+          response = await fetch(`${API_URL}/api/extract`, {
             method: "POST",
             body: formData,
-          }
-        );
+          });
+        } catch (error) {
+          console.error("Create file extraction request failed:", {
+            apiUrl: API_URL,
+            error,
+          });
+
+          throw new Error(
+            `Unable to connect to the RAFTA backend at ${API_URL}.`
+          );
+        }
 
         let data: {
           detail?: string;

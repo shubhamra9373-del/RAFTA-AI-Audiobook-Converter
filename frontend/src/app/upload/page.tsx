@@ -12,7 +12,17 @@ import {
   type SavedBook,
 } from "../../components/storage";
 
-const API_URL = "http://127.0.0.1:8000";
+const LOCAL_API_URL = "http://127.0.0.1:8000";
+const PUBLIC_API_URL =
+  "https://rafta-ai-audiobook-converter.onrender.com";
+
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\\/$/, "") ||
+  (typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1")
+    ? LOCAL_API_URL
+    : PUBLIC_API_URL);
 
 export default function UploadPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -124,13 +134,23 @@ export default function UploadPage() {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await fetch(
-      `${API_URL}/api/extract`,
-      {
+    let response: Response;
+
+    try {
+      response = await fetch(`${API_URL}/api/extract`, {
         method: "POST",
         body: formData,
-      }
-    );
+      });
+    } catch (error) {
+      console.error("Book extraction request failed:", {
+        apiUrl: API_URL,
+        error,
+      });
+
+      throw new Error(
+        `Unable to connect to the RAFTA backend. Please make sure the backend is running and reachable at ${API_URL}.`
+      );
+    }
 
     let data: {
       detail?: string;
@@ -146,7 +166,7 @@ export default function UploadPage() {
     if (!response.ok) {
       throw new Error(
         data.detail ||
-          `Unable to extract text from the ${extension} file.`
+          `Unable to extract text from the ${extension} file. Backend returned HTTP ${response.status}.`
       );
     }
 

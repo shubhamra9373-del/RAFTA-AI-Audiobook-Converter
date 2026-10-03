@@ -1,20 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import {
-  usePathname,
-  useRouter,
-} from "next/navigation";
-import {
-  useEffect,
-  useState,
-} from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { ReactNode, useEffect, useState } from "react";
 
 interface SidebarProps {
   collapsed?: boolean;
-  onCollapseChange?: (
-    collapsed: boolean
-  ) => void;
+  onCollapseChange?: (collapsed: boolean) => void;
   mobileOpen?: boolean;
   onMobileClose?: () => void;
   showUser?: boolean;
@@ -24,7 +16,7 @@ interface SidebarProps {
 interface SidebarItem {
   label: string;
   href: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   badge?: string | number;
 }
 
@@ -33,14 +25,15 @@ interface SidebarSection {
   items: SidebarItem[];
 }
 
-/*
- * SVG icon helper.
- */
+/* =========================================================
+   SVG ICON HELPER
+========================================================= */
+
 function Icon({
   children,
   size = 20,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   size?: number;
 }) {
   return (
@@ -57,9 +50,10 @@ function Icon({
   );
 }
 
-/*
- * Sidebar navigation.
- */
+/* =========================================================
+   SIDEBAR NAVIGATION
+========================================================= */
+
 const sidebarSections: SidebarSection[] = [
   {
     title: "MAIN",
@@ -122,9 +116,43 @@ const sidebarSections: SidebarSection[] = [
           </Icon>
         ),
       },
+    ],
+  },
+
+  {
+    title: "LIBRARY",
+    items: [
       {
-        label: "Library",
-        href: "/library",
+        label: "Upload Book",
+        href: "/upload",
+        icon: (
+          <Icon>
+            <path
+              d="M12 16V4"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+            <path
+              d="m7 9 5-5 5 5"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M5 20h14"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          </Icon>
+        ),
+      },
+
+      {
+        label: "Book Library",
+        href: "/books",
         icon: (
           <Icon>
             <path
@@ -148,6 +176,42 @@ const sidebarSections: SidebarSection[] = [
           </Icon>
         ),
       },
+
+      {
+        label: "Generated Audio",
+        href: "/library",
+        icon: (
+          <Icon>
+            <path
+              d="M9 18V6"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+            <path
+              d="M9 6c4-1 7-1 10 1v8"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+            <circle
+              cx="6"
+              cy="18"
+              r="3"
+              stroke="currentColor"
+              strokeWidth="1.8"
+            />
+            <circle
+              cx="16"
+              cy="17"
+              r="3"
+              stroke="currentColor"
+              strokeWidth="1.8"
+            />
+          </Icon>
+        ),
+      },
+
       {
         label: "Player",
         href: "/player",
@@ -169,6 +233,7 @@ const sidebarSections: SidebarSection[] = [
       },
     ],
   },
+
   {
     title: "ACCOUNT",
     items: [
@@ -192,6 +257,7 @@ const sidebarSections: SidebarSection[] = [
           </Icon>
         ),
       },
+
       {
         label: "Settings",
         href: "/settings",
@@ -220,6 +286,10 @@ const defaultUser = {
   email: "Welcome to RAFTA AI",
 };
 
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
 export default function Sidebar({
   collapsed: controlledCollapsed,
   onCollapseChange,
@@ -231,70 +301,66 @@ export default function Sidebar({
   const pathname = usePathname();
   const router = useRouter();
 
-  const [internalCollapsed, setInternalCollapsed] =
-    useState(false);
+  const [internalCollapsed, setInternalCollapsed] = useState(false);
+  const [user, setUser] = useState(defaultUser);
+  const [mounted, setMounted] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
 
-  const [user, setUser] =
-    useState(defaultUser);
+  const collapsed = controlledCollapsed ?? internalCollapsed;
 
-  const [mounted, setMounted] =
-    useState(false);
-
-  const [logoutOpen, setLogoutOpen] =
-    useState(false);
-
-  const collapsed =
-    controlledCollapsed ??
-    internalCollapsed;
+  /* =======================================================
+     LOAD USER
+  ======================================================= */
 
   useEffect(() => {
     setMounted(true);
 
     try {
-      const possibleName =
-        localStorage.getItem(
-          "rafta_user_name"
-        );
+      const possibleName = localStorage.getItem("rafta_user_name");
+      const possibleEmail = localStorage.getItem("rafta_user_email");
+      const localUser = localStorage.getItem("rafta_user");
+      const sessionUser = sessionStorage.getItem("rafta_user");
 
-      const possibleEmail =
-        localStorage.getItem(
-          "rafta_user_email"
-        );
-
-      const sessionUser =
-        sessionStorage.getItem(
-          "rafta_user"
-        );
-
-      if (
-        possibleName ||
-        possibleEmail
-      ) {
+      if (possibleName || possibleEmail) {
         setUser({
-          name:
-            possibleName ||
-            defaultUser.name,
-          email:
-            possibleEmail ||
-            defaultUser.email,
+          name: possibleName || defaultUser.name,
+          email: possibleEmail || defaultUser.email,
         });
         return;
       }
 
-      if (sessionUser) {
+      if (localUser) {
         try {
-          const parsed =
-            JSON.parse(sessionUser);
+          const parsed = JSON.parse(localUser);
 
           setUser({
             name:
-              typeof parsed?.name ===
-              "string"
+              typeof parsed?.name === "string"
                 ? parsed.name
                 : defaultUser.name,
             email:
-              typeof parsed?.email ===
-              "string"
+              typeof parsed?.email === "string"
+                ? parsed.email
+                : defaultUser.email,
+          });
+
+          return;
+        } catch {
+          // Ignore invalid local user data.
+        }
+      }
+
+      if (sessionUser) {
+        try {
+          const parsed = JSON.parse(sessionUser);
+
+          setUser({
+            name:
+              typeof parsed?.name === "string"
+                ? parsed.name
+                : defaultUser.name,
+            email:
+              typeof parsed?.email === "string"
                 ? parsed.email
                 : defaultUser.email,
           });
@@ -303,59 +369,54 @@ export default function Sidebar({
         }
       }
     } catch (error) {
-      console.error(
-        "Could not load sidebar user:",
-        error
-      );
+      console.error("Could not load sidebar user:", error);
     }
   }, []);
 
-  /*
-   * Close mobile sidebar when route changes.
-   */
+  /* =======================================================
+     CLOSE MOBILE SIDEBAR ON ROUTE CHANGE
+  ======================================================= */
+
   useEffect(() => {
     onMobileClose?.();
-  }, [pathname]);
+  }, [pathname, onMobileClose]);
 
-  /*
-   * Close logout confirmation with Escape.
-   */
+  /* =======================================================
+     ESCAPE CLOSES LOGOUT MODAL
+  ======================================================= */
+
   useEffect(() => {
     if (!logoutOpen) {
       return;
     }
 
-    const handleKeyDown = (
-      event: KeyboardEvent
-    ) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setLogoutOpen(false);
       }
     };
 
-    window.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [logoutOpen]);
 
-  const setCollapsed = (
-    nextValue: boolean
-  ) => {
+  /* =======================================================
+     COLLAPSE
+  ======================================================= */
+
+  const setCollapsed = (nextValue: boolean) => {
     setInternalCollapsed(nextValue);
     onCollapseChange?.(nextValue);
   };
 
-  const isActive = (
-    href: string
-  ) => {
+  /* =======================================================
+     ACTIVE ROUTE
+  ======================================================= */
+
+  const isActive = (href: string) => {
     if (href === "/") {
       return pathname === "/";
     }
@@ -366,69 +427,43 @@ export default function Sidebar({
     );
   };
 
+  /* =======================================================
+     USER INITIALS
+  ======================================================= */
+
   const getInitials = () => {
-    const name =
-      user.name.trim();
+    const name = user.name.trim();
 
     if (!name) {
       return "R";
     }
 
-    const parts =
-      name.split(/\s+/);
+    const parts = name.split(/\s+/);
 
     if (parts.length === 1) {
-      return parts[0]
-        .slice(0, 2)
-        .toUpperCase();
+      return parts[0].slice(0, 2).toUpperCase();
     }
 
-    return `${parts[0][0]}${parts[1][0]}`
-      .toUpperCase();
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
   };
+
+  /* =======================================================
+     LOGOUT
+  ======================================================= */
 
   const handleLogout = () => {
     try {
-      /*
-       * Remove common local/session authentication
-       * values used by the RAFTA frontend.
-       */
-      localStorage.removeItem(
-        "rafta_user"
-      );
+      localStorage.removeItem("rafta_user");
+      localStorage.removeItem("rafta_user_name");
+      localStorage.removeItem("rafta_user_email");
+      localStorage.removeItem("rafta_token");
+      localStorage.removeItem("rafta_auth_token");
 
-      localStorage.removeItem(
-        "rafta_user_name"
-      );
-
-      localStorage.removeItem(
-        "rafta_user_email"
-      );
-
-      localStorage.removeItem(
-        "rafta_token"
-      );
-
-      localStorage.removeItem(
-        "rafta_auth_token"
-      );
-
-      sessionStorage.removeItem(
-        "rafta_user"
-      );
-
-      sessionStorage.removeItem(
-        "rafta_token"
-      );
-
-      sessionStorage.removeItem(
-        "rafta_auth_token"
-      );
+      sessionStorage.removeItem("rafta_user");
+      sessionStorage.removeItem("rafta_token");
+      sessionStorage.removeItem("rafta_auth_token");
     } catch (error) {
-      console.error(
-        "Logout cleanup error:",
-        error
-      );
+      console.error("Logout cleanup error:", error);
     }
 
     setLogoutOpen(false);
@@ -439,16 +474,16 @@ export default function Sidebar({
 
   const sidebarClasses = [
     "rafta-sidebar",
-    collapsed
-      ? "rafta-sidebar-collapsed"
-      : "",
-    mobileOpen
-      ? "rafta-sidebar-mobile-open"
-      : "",
+    collapsed ? "rafta-sidebar-collapsed" : "",
+    mobileOpen ? "rafta-sidebar-mobile-open" : "",
     className,
   ]
     .filter(Boolean)
     .join(" ");
+
+  /* =======================================================
+     RENDER
+  ======================================================= */
 
   return (
     <>
@@ -458,17 +493,13 @@ export default function Sidebar({
       >
         <div className="rafta-sidebar-inner">
 
-          {/* -------------------------------------------------
-              Logo
-          -------------------------------------------------- */}
+          {/* LOGO */}
 
           <div className="rafta-sidebar-header">
             <Link
               href="/dashboard"
               className="rafta-sidebar-logo"
-              onClick={() =>
-                onMobileClose?.()
-              }
+              onClick={() => onMobileClose?.()}
             >
               <span className="rafta-sidebar-logo-mark">
                 R
@@ -476,8 +507,7 @@ export default function Sidebar({
 
               {!collapsed && (
                 <span className="rafta-sidebar-logo-text">
-                  RAFTA{" "}
-                  <strong>AI</strong>
+                  RAFTA <strong>AI</strong>
                 </span>
               )}
             </Link>
@@ -485,11 +515,7 @@ export default function Sidebar({
             <button
               type="button"
               className="rafta-sidebar-collapse"
-              onClick={() =>
-                setCollapsed(
-                  !collapsed
-                )
-              }
+              onClick={() => setCollapsed(!collapsed)}
               aria-label={
                 collapsed
                   ? "Expand sidebar"
@@ -513,17 +539,13 @@ export default function Sidebar({
             </button>
           </div>
 
-          {/* -------------------------------------------------
-              Create Button
-          -------------------------------------------------- */}
+          {/* CREATE BUTTON */}
 
           <div className="rafta-sidebar-create-wrapper">
             <Link
               href="/create"
               className="rafta-sidebar-create"
-              onClick={() =>
-                onMobileClose?.()
-              }
+              onClick={() => onMobileClose?.()}
               title={
                 collapsed
                   ? "Create Audiobook"
@@ -535,139 +557,102 @@ export default function Sidebar({
               </span>
 
               {!collapsed && (
-                <span>
-                  Create Audiobook
-                </span>
+                <span>Create Audiobook</span>
               )}
             </Link>
           </div>
 
-          {/* -------------------------------------------------
-              Navigation
-          -------------------------------------------------- */}
+          {/* NAVIGATION */}
 
           <div className="rafta-sidebar-navigation">
-            {sidebarSections.map(
-              (section) => (
-                <div
-                  key={section.title}
-                  className="rafta-sidebar-section"
+            {sidebarSections.map((section) => (
+              <div
+                key={section.title}
+                className="rafta-sidebar-section"
+              >
+                {!collapsed && (
+                  <div className="rafta-sidebar-section-title">
+                    {section.title}
+                  </div>
+                )}
+
+                {collapsed && (
+                  <div className="rafta-sidebar-section-line" />
+                )}
+
+                <nav
+                  className="rafta-sidebar-nav"
+                  aria-label={section.title}
                 >
-                  {!collapsed && (
-                    <div className="rafta-sidebar-section-title">
-                      {section.title}
-                    </div>
-                  )}
+                  {section.items.map((item) => {
+                    const active = isActive(item.href);
 
-                  {collapsed && (
-                    <div className="rafta-sidebar-section-line" />
-                  )}
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={[
+                          "rafta-sidebar-item",
+                          active ? "active" : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                        onClick={() => onMobileClose?.()}
+                        title={
+                          collapsed
+                            ? item.label
+                            : undefined
+                        }
+                        aria-current={
+                          active ? "page" : undefined
+                        }
+                      >
+                        <span className="rafta-sidebar-item-icon">
+                          {item.icon}
+                        </span>
 
-                  <nav
-                    className="rafta-sidebar-nav"
-                    aria-label={
-                      section.title
-                    }
-                  >
-                    {section.items.map(
-                      (item) => {
-                        const active =
-                          isActive(
-                            item.href
-                          );
+                        {!collapsed && (
+                          <span className="rafta-sidebar-item-label">
+                            {item.label}
+                          </span>
+                        )}
 
-                        return (
-                          <Link
-                            key={
-                              item.href
-                            }
-                            href={
-                              item.href
-                            }
-                            className={[
-                              "rafta-sidebar-item",
-                              active
-                                ? "active"
-                                : "",
-                            ]
-                              .filter(
-                                Boolean
-                              )
-                              .join(" ")}
-                            onClick={() =>
-                              onMobileClose?.()
-                            }
-                            title={
-                              collapsed
-                                ? item.label
-                                : undefined
-                            }
-                            aria-current={
-                              active
-                                ? "page"
-                                : undefined
-                            }
-                          >
-                            <span className="rafta-sidebar-item-icon">
-                              {item.icon}
+                        {!collapsed &&
+                          item.badge !== undefined && (
+                            <span className="rafta-sidebar-item-badge">
+                              {item.badge}
                             </span>
+                          )}
 
-                            {!collapsed && (
-                              <span className="rafta-sidebar-item-label">
-                                {
-                                  item.label
-                                }
-                              </span>
-                            )}
-
-                            {!collapsed &&
-                              item.badge !==
-                                undefined && (
-                                <span className="rafta-sidebar-item-badge">
-                                  {
-                                    item.badge
-                                  }
-                                </span>
-                              )}
-
-                            {active && (
-                              <span className="rafta-sidebar-active-indicator" />
-                            )}
-                          </Link>
-                        );
-                      }
-                    )}
-                  </nav>
-                </div>
-              )
-            )}
+                        {active && (
+                          <span className="rafta-sidebar-active-indicator" />
+                        )}
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </div>
+            ))}
           </div>
 
-          {/* -------------------------------------------------
-              Bottom area
-          -------------------------------------------------- */}
+          {/* BOTTOM AREA */}
 
           <div className="rafta-sidebar-bottom">
             {!collapsed && (
               <Link
                 href="/create"
                 className="rafta-sidebar-upgrade"
-                onClick={() =>
-                  onMobileClose?.()
-                }
+                onClick={() => onMobileClose?.()}
               >
                 <div className="rafta-sidebar-upgrade-icon">
                   ✦
                 </div>
 
                 <div className="rafta-sidebar-upgrade-content">
-                  <strong>
-                    Create more
-                  </strong>
+                  <strong>Create more</strong>
 
                   <span>
-                    Turn your text into
-                    audio
+                    Turn your text into audio
                   </span>
                 </div>
 
@@ -680,9 +665,7 @@ export default function Sidebar({
             {showUser && (
               <div className="rafta-sidebar-user">
                 <div className="rafta-sidebar-user-avatar">
-                  {mounted
-                    ? getInitials()
-                    : "R"}
+                  {mounted ? getInitials() : "R"}
                 </div>
 
                 {!collapsed && (
@@ -705,11 +688,7 @@ export default function Sidebar({
                   <button
                     type="button"
                     className="rafta-sidebar-user-menu"
-                    onClick={() =>
-                      setLogoutOpen(
-                        true
-                      )
-                    }
+                    onClick={() => setLogoutOpen(true)}
                     aria-label="Open account menu"
                     title="Account menu"
                   >
@@ -721,11 +700,7 @@ export default function Sidebar({
                   <button
                     type="button"
                     className="rafta-sidebar-collapsed-logout"
-                    onClick={() =>
-                      setLogoutOpen(
-                        true
-                      )
-                    }
+                    onClick={() => setLogoutOpen(true)}
                     aria-label="Log out"
                     title="Log out"
                   >
@@ -738,33 +713,24 @@ export default function Sidebar({
         </div>
       </aside>
 
-      {/* -------------------------------------------------
-          Mobile overlay
-      -------------------------------------------------- */}
+      {/* MOBILE OVERLAY */}
 
       {mobileOpen && (
         <button
           type="button"
           className="rafta-sidebar-mobile-overlay"
-          onClick={() =>
-            onMobileClose?.()
-          }
+          onClick={() => onMobileClose?.()}
           aria-label="Close sidebar"
         />
       )}
 
-      {/* -------------------------------------------------
-          Logout modal
-      -------------------------------------------------- */}
+      {/* LOGOUT MODAL */}
 
       {logoutOpen && (
         <div
           className="rafta-sidebar-logout-overlay"
           onMouseDown={(event) => {
-            if (
-              event.target ===
-              event.currentTarget
-            ) {
+            if (event.target === event.currentTarget) {
               setLogoutOpen(false);
             }
           }}
@@ -785,17 +751,15 @@ export default function Sidebar({
             </h2>
 
             <p>
-              Are you sure you want to log
-              out of your RAFTA AI account?
+              Are you sure you want to log out
+              of your RAFTA AI account?
             </p>
 
             <div className="rafta-sidebar-logout-actions">
               <button
                 type="button"
                 className="rafta-sidebar-logout-cancel"
-                onClick={() =>
-                  setLogoutOpen(false)
-                }
+                onClick={() => setLogoutOpen(false)}
               >
                 Cancel
               </button>
@@ -815,11 +779,10 @@ export default function Sidebar({
   );
 }
 
-/*
- * Mobile sidebar trigger.
- *
- * Use this in pages with a mobile layout.
- */
+/* =========================================================
+   MOBILE MENU BUTTON
+========================================================= */
+
 export function SidebarMenuButton({
   onClick,
   open = false,
@@ -848,18 +811,19 @@ export function SidebarMenuButton({
   );
 }
 
-/*
- * Simple desktop/mobile sidebar layout helper.
- */
+/* =========================================================
+   SIDEBAR LAYOUT
+========================================================= */
+
 export function SidebarLayout({
   children,
   sidebar,
   mobileHeader,
   className = "",
 }: {
-  children: React.ReactNode;
-  sidebar: React.ReactNode;
-  mobileHeader?: React.ReactNode;
+  children: ReactNode;
+  sidebar: ReactNode;
+  mobileHeader?: ReactNode;
   className?: string;
 }) {
   return (
@@ -878,4 +842,3 @@ export function SidebarLayout({
     </div>
   );
 }
-

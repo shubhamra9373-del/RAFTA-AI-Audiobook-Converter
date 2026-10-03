@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
+
 import "./globals.css";
 
+import BackgroundGenerationManager from "../components/BackgroundGenerationManager";
+
 export const metadata: Metadata = {
-  title: "AI Audiobook Converter",
-  description: "Convert Text and Books into Natural AI Audiobooks",
+  title:
+    "RAFTA AI Audiobook Converter",
+
+  description:
+    "Convert text and books into natural-sounding AI audiobooks with RAFTA.",
 };
 
 export default function RootLayout({
@@ -13,8 +19,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <BackgroundGenerationManager />
+
+        {children}
+      </body>
     </html>
   );
 }
-

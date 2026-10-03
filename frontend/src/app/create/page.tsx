@@ -1240,3 +1240,10 @@ export default function CreatePage() {
     </AuthGuard>
   );
 }
+import {
+  DEFAULT_RAFTA_VOICE,
+  RAFTA_VOICES,
+} from "../../components/voiceCatalog";
+const [voice, setVoice] = useState(
+  DEFAULT_RAFTA_VOICE
+);

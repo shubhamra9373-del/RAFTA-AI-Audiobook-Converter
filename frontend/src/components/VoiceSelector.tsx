@@ -1,684 +1,379 @@
 "use client";
 
-import { useMemo } from "react";
+import {
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 
-/* =========================================================
-   RAFTA VOICE SELECTOR + DUBBING
-========================================================= */
-
-export interface RaftaVoice {
-  id: string;
-  name: string;
-  language: string;
-  languageCode: string;
-  gender: "Male" | "Female";
-  region: string;
-}
-
-export interface RaftaDubLanguage {
-  code: string;
-  name: string;
-  nativeName: string;
-  flag: string;
-  voice: string;
-}
+import {
+  DEFAULT_RAFTA_VOICE,
+  RAFTA_VOICES,
+  type RaftaVoice,
+} from "./voiceCatalog";
 
 interface VoiceSelectorProps {
   value?: string;
   selectedVoice?: string;
+  voice?: string;
 
-  onChange?: (voice: string) => void;
-  onVoiceChange?: (voice: string) => void;
+  onChange?: (voiceId: string) => void;
+  onVoiceChange?: (voiceId: string) => void;
+  onSelect?: (voiceId: string) => void;
 
-  dubEnabled?: boolean;
-  onDubEnabledChange?: (enabled: boolean) => void;
-
-  dubLanguage?: string;
-  selectedDubLanguage?: string;
-
-  onDubLanguageChange?: (
-    language: string
-  ) => void;
-
+  label?: string;
   disabled?: boolean;
+  className?: string;
+
+  [key: string]: any;
 }
 
-
-/* =========================================================
-   INDIAN VOICES
-========================================================= */
-
-export const RAFTA_INDIAN_VOICES: RaftaVoice[] = [
-  /* English - India */
-  {
-    id: "en-IN-NeerjaNeural",
-    name: "Neerja",
-    language: "English",
-    languageCode: "en-IN",
-    gender: "Female",
-    region: "India",
-  },
-  {
-    id: "en-IN-PrabhatNeural",
-    name: "Prabhat",
-    language: "English",
-    languageCode: "en-IN",
-    gender: "Male",
-    region: "India",
-  },
-
-  /* Hindi */
-  {
-    id: "hi-IN-SwaraNeural",
-    name: "Swara",
-    language: "Hindi",
-    languageCode: "hi-IN",
-    gender: "Female",
-    region: "India",
-  },
-  {
-    id: "hi-IN-AartiNeural",
-    name: "Aarti",
-    language: "Hindi",
-    languageCode: "hi-IN",
-    gender: "Female",
-    region: "India",
-  },
-  {
-    id: "hi-IN-AnanyaNeural",
-    name: "Ananya",
-    language: "Hindi",
-    languageCode: "hi-IN",
-    gender: "Female",
-    region: "India",
-  },
-  {
-    id: "hi-IN-KavyaNeural",
-    name: "Kavya",
-    language: "Hindi",
-    languageCode: "hi-IN",
-    gender: "Female",
-    region: "India",
-  },
-  {
-    id: "hi-IN-MadhurNeural",
-    name: "Madhur",
-    language: "Hindi",
-    languageCode: "hi-IN",
-    gender: "Male",
-    region: "India",
-  },
-  {
-    id: "hi-IN-AaravNeural",
-    name: "Aarav",
-    language: "Hindi",
-    languageCode: "hi-IN",
-    gender: "Male",
-    region: "India",
-  },
-  {
-    id: "hi-IN-ArjunNeural",
-    name: "Arjun",
-    language: "Hindi",
-    languageCode: "hi-IN",
-    gender: "Male",
-    region: "India",
-  },
-  {
-    id: "hi-IN-KunalNeural",
-    name: "Kunal",
-    language: "Hindi",
-    languageCode: "hi-IN",
-    gender: "Male",
-    region: "India",
-  },
-  {
-    id: "hi-IN-RehaanNeural",
-    name: "Rehaan",
-    language: "Hindi",
-    languageCode: "hi-IN",
-    gender: "Male",
-    region: "India",
-  },
-
-  /* Marathi */
-  {
-    id: "mr-IN-AarohiNeural",
-    name: "Aarohi",
-    language: "Marathi",
-    languageCode: "mr-IN",
-    gender: "Female",
-    region: "India",
-  },
-  {
-    id: "mr-IN-ManoharNeural",
-    name: "Manohar",
-    language: "Marathi",
-    languageCode: "mr-IN",
-    gender: "Male",
-    region: "India",
-  },
-
-  /* Telugu */
-  {
-    id: "te-IN-ShrutiNeural",
-    name: "Shruti",
-    language: "Telugu",
-    languageCode: "te-IN",
-    gender: "Female",
-    region: "India",
-  },
-  {
-    id: "te-IN-MohanNeural",
-    name: "Mohan",
-    language: "Telugu",
-    languageCode: "te-IN",
-    gender: "Male",
-    region: "India",
-  },
-
-  /* Tamil */
-  {
-    id: "ta-IN-PallaviNeural",
-    name: "Pallavi",
-    language: "Tamil",
-    languageCode: "ta-IN",
-    gender: "Female",
-    region: "India",
-  },
-  {
-    id: "ta-IN-ValluvarNeural",
-    name: "Valluvar",
-    language: "Tamil",
-    languageCode: "ta-IN",
-    gender: "Male",
-    region: "India",
-  },
-
-  /* Malayalam */
-  {
-    id: "ml-IN-SobhanaNeural",
-    name: "Sobhana",
-    language: "Malayalam",
-    languageCode: "ml-IN",
-    gender: "Female",
-    region: "India",
-  },
-  {
-    id: "ml-IN-MidhunNeural",
-    name: "Midhun",
-    language: "Malayalam",
-    languageCode: "ml-IN",
-    gender: "Male",
-    region: "India",
-  },
-
-  /* Gujarati */
-  {
-    id: "gu-IN-DhwaniNeural",
-    name: "Dhwani",
-    language: "Gujarati",
-    languageCode: "gu-IN",
-    gender: "Female",
-    region: "India",
-  },
-  {
-    id: "gu-IN-NiranjanNeural",
-    name: "Niranjan",
-    language: "Gujarati",
-    languageCode: "gu-IN",
-    gender: "Male",
-    region: "India",
-  },
-
-  /* Kannada */
-  {
-    id: "kn-IN-SapnaNeural",
-    name: "Sapna",
-    language: "Kannada",
-    languageCode: "kn-IN",
-    gender: "Female",
-    region: "India",
-  },
-  {
-    id: "kn-IN-GaganNeural",
-    name: "Gagan",
-    language: "Kannada",
-    languageCode: "kn-IN",
-    gender: "Male",
-    region: "India",
-  },
-
-  /* Bengali */
-  {
-    id: "bn-IN-TanishaaNeural",
-    name: "Tanishaa",
-    language: "Bengali",
-    languageCode: "bn-IN",
-    gender: "Female",
-    region: "India",
-  },
-  {
-    id: "bn-IN-BashkarNeural",
-    name: "Bashkar",
-    language: "Bengali",
-    languageCode: "bn-IN",
-    gender: "Male",
-    region: "India",
-  },
-
-  /* Punjabi */
-  {
-    id: "pa-IN-VaaniNeural",
-    name: "Vaani",
-    language: "Punjabi",
-    languageCode: "pa-IN",
-    gender: "Female",
-    region: "India",
-  },
-  {
-    id: "pa-IN-OjasNeural",
-    name: "Ojas",
-    language: "Punjabi",
-    languageCode: "pa-IN",
-    gender: "Male",
-    region: "India",
-  },
-
-  /* Odia */
-  {
-    id: "or-IN-SubhasiniNeural",
-    name: "Subhasini",
-    language: "Odia",
-    languageCode: "or-IN",
-    gender: "Female",
-    region: "India",
-  },
-  {
-    id: "or-IN-SukantNeural",
-    name: "Sukant",
-    language: "Odia",
-    languageCode: "or-IN",
-    gender: "Male",
-    region: "India",
-  },
-
-  /* Assamese */
-  {
-    id: "as-IN-YashicaNeural",
-    name: "Yashica",
-    language: "Assamese",
-    languageCode: "as-IN",
-    gender: "Female",
-    region: "India",
-  },
-  {
-    id: "as-IN-PriyomNeural",
-    name: "Priyom",
-    language: "Assamese",
-    languageCode: "as-IN",
-    gender: "Male",
-    region: "India",
-  },
-];
-
-
-/* =========================================================
-   DUBBING LANGUAGES
-========================================================= */
-
-export const RAFTA_DUB_LANGUAGES:
-  RaftaDubLanguage[] = [
-    {
-      code: "hi",
-      name: "Hindi",
-      nativeName: "हिन्दी",
-      flag: "🇮🇳",
-      voice: "hi-IN-SwaraNeural",
-    },
-    {
-      code: "mr",
-      name: "Marathi",
-      nativeName: "मराठी",
-      flag: "🇮🇳",
-      voice: "mr-IN-AarohiNeural",
-    },
-    {
-      code: "te",
-      name: "Telugu",
-      nativeName: "తెలుగు",
-      flag: "🇮🇳",
-      voice: "te-IN-ShrutiNeural",
-    },
-    {
-      code: "ta",
-      name: "Tamil",
-      nativeName: "தமிழ்",
-      flag: "🇮🇳",
-      voice: "ta-IN-PallaviNeural",
-    },
-    {
-      code: "ml",
-      name: "Malayalam",
-      nativeName: "മലയാളം",
-      flag: "🇮🇳",
-      voice: "ml-IN-SobhanaNeural",
-    },
-    {
-      code: "gu",
-      name: "Gujarati",
-      nativeName: "ગુજરાતી",
-      flag: "🇮🇳",
-      voice: "gu-IN-DhwaniNeural",
-    },
-    {
-      code: "kn",
-      name: "Kannada",
-      nativeName: "ಕನ್ನಡ",
-      flag: "🇮🇳",
-      voice: "kn-IN-SapnaNeural",
-    },
-    {
-      code: "bn",
-      name: "Bengali",
-      nativeName: "বাংলা",
-      flag: "🇮🇳",
-      voice: "bn-IN-TanishaaNeural",
-    },
-    {
-      code: "pa",
-      name: "Punjabi",
-      nativeName: "ਪੰਜਾਬੀ",
-      flag: "🇮🇳",
-      voice: "pa-IN-VaaniNeural",
-    },
-    {
-      code: "or",
-      name: "Odia",
-      nativeName: "ଓଡ଼ିଆ",
-      flag: "🇮🇳",
-      voice: "or-IN-SubhasiniNeural",
-    },
-    {
-      code: "as",
-      name: "Assamese",
-      nativeName: "অসমীয়া",
-      flag: "🇮🇳",
-      voice: "as-IN-YashicaNeural",
-    },
-    {
-      code: "en",
-      name: "English",
-      nativeName: "English",
-      flag: "🌐",
-      voice: "en-IN-NeerjaNeural",
-    },
-    {
-      code: "ur",
-      name: "Urdu",
-      nativeName: "اردو",
-      flag: "🌐",
-      voice: "hi-IN-MadhurNeural",
-    },
-  ];
-
-
-/* =========================================================
-   COMPONENT
-========================================================= */
+function VoiceIcon({
+  gender,
+}: {
+  gender: "Male" | "Female";
+}) {
+  return (
+    <span
+      style={{
+        width: 34,
+        height: 34,
+        borderRadius: 10,
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background:
+          gender === "Female"
+            ? "rgba(236, 72, 153, 0.14)"
+            : "rgba(124, 77, 255, 0.14)",
+        color:
+          gender === "Female"
+            ? "#f472b6"
+            : "#9b7cff",
+        flexShrink: 0,
+        fontSize: 16,
+      }}
+    >
+      {gender === "Female" ? "♀" : "♂"}
+    </span>
+  );
+}
 
 export default function VoiceSelector({
   value,
   selectedVoice,
-
+  voice,
   onChange,
   onVoiceChange,
-
-  dubEnabled = false,
-  onDubEnabledChange,
-
-  dubLanguage = "hi",
-  selectedDubLanguage,
-
-  onDubLanguageChange,
-
+  onSelect,
+  label = "AI Voice",
   disabled = false,
+  className = "",
 }: VoiceSelectorProps) {
-  const currentVoice =
+  const currentValue =
     value ??
     selectedVoice ??
-    "en-IN-NeerjaNeural";
+    voice ??
+    DEFAULT_RAFTA_VOICE;
 
-  const currentDubLanguage =
-    selectedDubLanguage ??
-    dubLanguage;
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
 
-  const selectedVoiceData =
-    useMemo(() => {
-      return RAFTA_INDIAN_VOICES.find(
-        (voice) =>
-          voice.id === currentVoice
-      );
-    }, [currentVoice]);
-
-  const handleVoiceChange = (
-    nextVoice: string
-  ) => {
-    onChange?.(nextVoice);
-    onVoiceChange?.(nextVoice);
-  };
-
-  const handleDubChange = (
-    enabled: boolean
-  ) => {
-    onDubEnabledChange?.(
-      enabled
+  const selected = useMemo<RaftaVoice>(() => {
+    return (
+      RAFTA_VOICES.find(
+        (item) => item.id === currentValue
+      ) ?? RAFTA_VOICES[0]
     );
+  }, [currentValue]);
+
+  const filteredVoices = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    if (!query) {
+      return RAFTA_VOICES;
+    }
+
+    return RAFTA_VOICES.filter((item) => {
+      return (
+        item.name.toLowerCase().includes(query) ||
+        item.id.toLowerCase().includes(query) ||
+        item.language.toLowerCase().includes(query) ||
+        item.gender.toLowerCase().includes(query)
+      );
+    });
+  }, [search]);
+
+  const hindiVoices = filteredVoices.filter(
+    (item) => item.language === "Hindi"
+  );
+
+  const englishVoices = filteredVoices.filter(
+    (item) => item.language === "English"
+  );
+
+  const selectVoice = (voiceId: string) => {
+    onChange?.(voiceId);
+    onVoiceChange?.(voiceId);
+    onSelect?.(voiceId);
+
+    setOpen(false);
+    setSearch("");
   };
 
-  const handleLanguageChange = (
-    language: string
-  ) => {
-    onDubLanguageChange?.(
-      language
+  const renderVoice = (item: RaftaVoice) => {
+    const active = item.id === currentValue;
+
+    return (
+      <button
+        key={item.id}
+        type="button"
+        disabled={disabled}
+        onClick={() => selectVoice(item.id)}
+        style={{
+          width: "100%",
+          border: "none",
+          background: active
+            ? "rgba(124, 77, 255, 0.13)"
+            : "transparent",
+          color: "#edf1fc",
+          padding: "10px 11px",
+          borderRadius: 12,
+          display: "flex",
+          alignItems: "center",
+          gap: 11,
+          cursor: disabled
+            ? "not-allowed"
+            : "pointer",
+          textAlign: "left",
+          marginBottom: 4,
+        }}
+      >
+        <VoiceIcon gender={item.gender} />
+
+        <span
+          style={{
+            minWidth: 0,
+            flex: 1,
+          }}
+        >
+          <span
+            style={{
+              display: "block",
+              fontSize: 14,
+              fontWeight: 700,
+            }}
+          >
+            {item.name}
+          </span>
+
+          <span
+            style={{
+              display: "block",
+              marginTop: 2,
+              fontSize: 11,
+              color: "#8d98b8",
+            }}
+          >
+            {item.description}
+          </span>
+        </span>
+
+        {active && (
+          <span
+            style={{
+              color: "#9b7cff",
+              fontSize: 17,
+              fontWeight: 800,
+            }}
+          >
+            ✓
+          </span>
+        )}
+      </button>
     );
   };
 
   return (
-    <div className="rafta-voice-selector">
-      {/* =================================================
-          VOICE HEADER
-      ================================================= */}
+    <div
+      className={`rafta-voice-selector ${className}`.trim()}
+      style={{
+        width: "100%",
+        position: "relative",
+      }}
+    >
+      <label
+        style={{
+          display: "block",
+          marginBottom: 8,
+          color: "#edf1fc",
+          fontSize: 13,
+          fontWeight: 700,
+        }}
+      >
+        {label}
+      </label>
 
-      <div className="rafta-voice-selector-header">
-        <div>
-          <span className="rafta-voice-selector-eyebrow">
-            AI VOICE
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen((current) => !current)}
+        style={{
+          width: "100%",
+          minHeight: 60,
+          border: "1px solid rgba(124, 77, 255, 0.25)",
+          borderRadius: 14,
+          background: "#0b1423",
+          color: "#edf1fc",
+          display: "flex",
+          alignItems: "center",
+          gap: 11,
+          padding: "10px 12px",
+          cursor: disabled
+            ? "not-allowed"
+            : "pointer",
+          textAlign: "left",
+        }}
+      >
+        <VoiceIcon gender={selected.gender} />
+
+        <span
+          style={{
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
+          <span
+            style={{
+              display: "block",
+              fontWeight: 700,
+              fontSize: 14,
+            }}
+          >
+            {selected.name}
           </span>
 
-          <h3>
-            Choose Narrator
-          </h3>
-
-          <p>
-            Select an Indian male or
-            female AI voice for your
-            audiobook.
-          </p>
-        </div>
-      </div>
-
-      {/* =================================================
-          VOICE SELECT
-      ================================================= */}
-
-      <div className="rafta-voice-selector-field">
-        <label htmlFor="rafta-voice-select">
-          Narrator Voice
-        </label>
-
-        <select
-          id="rafta-voice-select"
-          value={currentVoice}
-          disabled={disabled}
-          onChange={(event) =>
-            handleVoiceChange(
-              event.target.value
-            )
-          }
-        >
-          {RAFTA_INDIAN_VOICES.map(
-            (voice) => (
-              <option
-                key={voice.id}
-                value={voice.id}
-              >
-                {voice.name} ·{" "}
-                {voice.language} ·{" "}
-                {voice.gender}
-              </option>
-            )
-          )}
-        </select>
-
-        {selectedVoiceData && (
-          <div className="rafta-voice-selected-info">
-            <span>
-              {selectedVoiceData.gender ===
-              "Female"
-                ? "♀"
-                : "♂"}
-            </span>
-
-            <strong>
-              {selectedVoiceData.name}
-            </strong>
-
-            <small>
-              {selectedVoiceData.language}
-              {" · "}
-              {selectedVoiceData.languageCode}
-            </small>
-          </div>
-        )}
-      </div>
-
-      {/* =================================================
-          DUBBING
-      ================================================= */}
-
-      <div className="rafta-dub-section">
-        <div className="rafta-dub-header">
-          <div>
-            <span className="rafta-dub-eyebrow">
-              NEW FEATURE
-            </span>
-
-            <h3>
-              🌐 Dub Audiobook
-            </h3>
-
-            <p>
-              Translate your uploaded
-              book into another language
-              and generate a new narrated
-              audiobook.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            className={`rafta-dub-toggle ${
-              dubEnabled
-                ? "active"
-                : ""
-            }`}
-            disabled={disabled}
-            onClick={() =>
-              handleDubChange(
-                !dubEnabled
-              )
-            }
-            aria-pressed={
-              dubEnabled
-            }
+          <span
+            style={{
+              display: "block",
+              marginTop: 2,
+              color: "#8995b5",
+              fontSize: 11,
+            }}
           >
-            <span className="rafta-dub-toggle-track">
-              <span className="rafta-dub-toggle-thumb" />
-            </span>
+            {selected.language} • {selected.gender}
+          </span>
+        </span>
 
-            <strong>
-              {dubEnabled
-                ? "ON"
-                : "OFF"}
-            </strong>
-          </button>
-        </div>
+        <span
+          style={{
+            color: "#9b7cff",
+            fontSize: 18,
+            transform: open
+              ? "rotate(180deg)"
+              : "none",
+            transition: "transform 0.2s ease",
+          }}
+        >
+          ▾
+        </span>
+      </button>
 
-        {dubEnabled && (
-          <div className="rafta-dub-options">
-            <div className="rafta-dub-language-field">
-              <label htmlFor="rafta-dub-language">
-                Dub Into
-              </label>
+      {open && (
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: "calc(100% + 8px)",
+            zIndex: 1000,
+            background: "#0b1423",
+            border:
+              "1px solid rgba(124, 77, 255, 0.24)",
+            borderRadius: 16,
+            boxShadow:
+              "0 20px 50px rgba(0,0,0,0.45)",
+            padding: 10,
+          }}
+        >
+          <input
+            value={search}
+            onChange={(event) =>
+              setSearch(event.target.value)
+            }
+            placeholder="Search voice..."
+            autoFocus
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              border:
+                "1px solid rgba(124, 77, 255, 0.18)",
+              outline: "none",
+              background: "#07101d",
+              color: "#edf1fc",
+              borderRadius: 11,
+              padding: "10px 12px",
+              fontSize: 13,
+              marginBottom: 10,
+            }}
+          />
 
-              <select
-                id="rafta-dub-language"
-                value={
-                  currentDubLanguage
-                }
-                disabled={disabled}
-                onChange={(
-                  event
-                ) =>
-                  handleLanguageChange(
-                    event.target
-                      .value
-                  )
-                }
+          {englishVoices.length > 0 && (
+            <div style={{ marginBottom: 9 }}>
+              <div
+                style={{
+                  fontSize: 10,
+                  fontWeight: 800,
+                  letterSpacing: "0.12em",
+                  color: "#6f7a9a",
+                  padding:
+                    "4px 8px 7px",
+                }}
               >
-                {RAFTA_DUB_LANGUAGES.map(
-                  (language) => (
-                    <option
-                      key={
-                        language.code
-                      }
-                      value={
-                        language.code
-                      }
-                    >
-                      {language.flag}{" "}
-                      {language.name} —{" "}
-                      {
-                        language.nativeName
-                      }
-                    </option>
-                  )
-                )}
-              </select>
-            </div>
-
-            <div className="rafta-dub-preview">
-              <div className="rafta-dub-preview-icon">
-                🌍
+                INDIAN ENGLISH
               </div>
 
-              <div>
-                <strong>
-                  Audiobook dubbing
-                </strong>
-
-                <p>
-                  Original text → translated
-                  text → selected Indian
-                  voice → new MP3 chapters
-                </p>
-              </div>
+              {englishVoices.map(renderVoice)}
             </div>
-          </div>
-        )}
-      </div>
+          )}
+
+          {hindiVoices.length > 0 && (
+            <div>
+              <div
+                style={{
+                  fontSize: 10,
+                  fontWeight: 800,
+                  letterSpacing: "0.12em",
+                  color: "#6f7a9a",
+                  padding:
+                    "4px 8px 7px",
+                }}
+              >
+                HINDI • 9 VOICES
+              </div>
+
+              {hindiVoices.map(renderVoice)}
+            </div>
+          )}
+
+          {filteredVoices.length === 0 && (
+            <div
+              style={{
+                padding: 20,
+                textAlign: "center",
+                color: "#7f8ba9",
+                fontSize: 13,
+              }}
+            >
+              No voices found.
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
+export type {
+  VoiceSelectorProps,
+};

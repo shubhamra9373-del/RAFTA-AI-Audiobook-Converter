@@ -2,10 +2,8 @@
 
 import { ChangeEvent, useEffect, useState } from "react";
 import Link from "next/link";
-
 import Sidebar from "../../components/Sidebar";
 import AuthGuard from "../../components/AuthGuard";
-
 import {
   getBooks,
   saveBooks,
@@ -13,11 +11,12 @@ import {
 } from "../../components/storage";
 
 const LOCAL_API_URL = "http://127.0.0.1:8000";
+
 const PUBLIC_API_URL =
   "https://rafta-ai-audiobook-converter.onrender.com";
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\\/$/, "") ||
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "") ||
   (typeof window !== "undefined" &&
   (window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1")
@@ -27,9 +26,9 @@ const API_URL =
 export default function UploadPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<
-    "success" | "error" | ""
-  >("");
+  const [messageType, setMessageType] = useState<"success" | "error" | "">(
+    ""
+  );
   const [saving, setSaving] = useState(false);
   const [bookCount, setBookCount] = useState(0);
 
@@ -37,9 +36,7 @@ export default function UploadPage() {
     setBookCount(getBooks().length);
   }, []);
 
-  const handleFile = (
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFile = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
     if (!file) {
@@ -51,25 +48,17 @@ export default function UploadPage() {
       .substring(file.name.lastIndexOf("."))
       .toLowerCase();
 
-    const allowedExtensions = [
-      ".txt",
-      ".pdf",
-      ".epub",
-    ];
+    const allowedExtensions = [".txt", ".pdf", ".epub"];
 
     if (!allowedExtensions.includes(extension)) {
       setSelectedFile(null);
-      setMessage(
-        "Please select a TXT, PDF, or EPUB file."
-      );
+      setMessage("Please select a TXT, PDF, or EPUB file.");
       setMessageType("error");
       return;
     }
 
     setSelectedFile(file);
-    setMessage(
-      `${file.name} is ready to add to your Book Library.`
-    );
+    setMessage(`${file.name} is ready to add to your Book Library.`);
     setMessageType("success");
   };
 
@@ -114,9 +103,7 @@ export default function UploadPage() {
     }
   };
 
-  const extractBookText = async (
-    file: File
-  ): Promise<string> => {
+  const extractBookText = async (file: File): Promise<string> => {
     const extension = getFileType(file.name);
 
     if (extension === "TXT") {
@@ -192,21 +179,18 @@ export default function UploadPage() {
     }
 
     setSaving(true);
-    setMessage(
-      "Reading your book and extracting text..."
-    );
+    setMessage("Reading your book and extracting text...");
     setMessageType("success");
 
     try {
       const extension = getFileType(selectedFile.name);
-
       const existingBooks = getBooks();
 
       const alreadyExists = existingBooks.some(
-  (book) =>
-    book.fileName?.toLowerCase() ===
-    selectedFile.name.toLowerCase()
-);
+        (book) =>
+          book.fileName?.toLowerCase() ===
+          selectedFile.name.toLowerCase()
+      );
 
       if (alreadyExists) {
         setMessage(
@@ -216,8 +200,7 @@ export default function UploadPage() {
         return;
       }
 
-      const content =
-        await extractBookText(selectedFile);
+      const content = await extractBookText(selectedFile);
 
       if (!content) {
         throw new Error(
@@ -243,7 +226,6 @@ export default function UploadPage() {
       ];
 
       saveBooks(updatedBooks);
-
       setBookCount(updatedBooks.length);
 
       setMessage(
@@ -253,16 +235,14 @@ export default function UploadPage() {
 
       clearSelectedFile();
     } catch (error) {
-      console.error(
-        "Failed to save book:",
-        error
-      );
+      console.error("Failed to save book:", error);
 
       setMessage(
         error instanceof Error
           ? error.message
           : "Unable to save this book. Please try again."
       );
+
       setMessageType("error");
     } finally {
       setSaving(false);
@@ -302,9 +282,7 @@ export default function UploadPage() {
 
           <section className="upload-stats">
             <div className="upload-stat-card">
-              <div className="upload-stat-icon">
-                📚
-              </div>
+              <div className="upload-stat-icon">📚</div>
 
               <div>
                 <span>BOOKS IN LIBRARY</span>
@@ -314,9 +292,7 @@ export default function UploadPage() {
             </div>
 
             <div className="upload-stat-card">
-              <div className="upload-stat-icon">
-                📄
-              </div>
+              <div className="upload-stat-icon">📄</div>
 
               <div>
                 <span>SUPPORTED FILES</span>
@@ -326,9 +302,7 @@ export default function UploadPage() {
             </div>
 
             <div className="upload-stat-card">
-              <div className="upload-stat-icon">
-                🎧
-              </div>
+              <div className="upload-stat-icon">🎧</div>
 
               <div>
                 <span>AUDIO STORAGE</span>
@@ -347,7 +321,6 @@ export default function UploadPage() {
 
                 <div>
                   <span>STEP 01</span>
-
                   <h2>Select a Book</h2>
 
                   <p>
@@ -407,9 +380,7 @@ export default function UploadPage() {
 
                     <div>
                       <span>
-                        {getFileType(
-                          selectedFile.name
-                        )}
+                        {getFileType(selectedFile.name)}
                       </span>
 
                       <span>
@@ -460,9 +431,7 @@ export default function UploadPage() {
                   type="button"
                   className="upload-save-btn"
                   onClick={handleSaveBook}
-                  disabled={
-                    saving || !selectedFile
-                  }
+                  disabled={saving || !selectedFile}
                 >
                   {saving ? (
                     <>

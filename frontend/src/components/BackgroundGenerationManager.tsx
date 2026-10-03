@@ -204,10 +204,13 @@ export default function BackgroundGenerationManager() {
   const runningRef =
     useRef(false);
 
+  /*
+   * Browser setInterval returns a number.
+   * Explicitly use number so Node's Timeout type
+   * does not conflict during the Next.js build.
+   */
   const intervalRef =
-    useRef<ReturnType<
-      typeof setInterval
-    > | null>(null);
+    useRef<number | null>(null);
 
   const mountedRef =
     useRef(false);
@@ -243,7 +246,9 @@ export default function BackgroundGenerationManager() {
   );
 
   const stopPolling = useCallback(() => {
-    if (intervalRef.current) {
+    if (
+      intervalRef.current !== null
+    ) {
       window.clearInterval(
         intervalRef.current
       );
@@ -282,7 +287,9 @@ export default function BackgroundGenerationManager() {
   };
 
   const pollBookJob = useCallback(
-    async (activeJob: ActiveBookJob) => {
+    async (
+      activeJob: ActiveBookJob
+    ) => {
       if (!runningRef.current) {
         return;
       }
@@ -951,7 +958,8 @@ export default function BackgroundGenerationManager() {
               fontSize: "10px",
               padding:
                 "4px 8px",
-              borderRadius: "999px",
+              borderRadius:
+                "999px",
               background:
                 "rgba(124,77,255,0.14)",
               color: "#bca9ff",

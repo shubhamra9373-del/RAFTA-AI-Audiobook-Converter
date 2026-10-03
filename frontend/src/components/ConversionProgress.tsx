@@ -100,13 +100,11 @@ const [elapsedSeconds, setElapsedSeconds] = useState(0);
 const normalizedProgress = useMemo(() => {
 const numericProgress = Number(progress);
 
-```
 if (!Number.isFinite(numericProgress)) {
   return 0;
 }
 
 return Math.min(100, Math.max(0, numericProgress));
-```
 
 }, [progress]);
 
@@ -126,11 +124,8 @@ status === "idle" && normalizedProgress > 0
   return;
   }
 
-```
 let frame = 0;
-```
 
-```
 const animate = () => {
   setDisplayProgress((current) => {
     const difference = normalizedProgress - current;
@@ -150,7 +145,6 @@ frame = window.requestAnimationFrame(animate);
 return () => {
   window.cancelAnimationFrame(frame);
 };
-```
 
 }, [normalizedProgress, animated]);
 
@@ -167,18 +161,14 @@ return () => {
   return;
   }
 
-```
 const timer = window.setInterval(() => {
-```
 
-```
   setElapsedSeconds((current) => current + 1);
 }, 1000);
 
 return () => {
   window.clearInterval(timer);
 };
-```
 
 }, [currentStatus]);
 
@@ -212,11 +202,9 @@ const formatElapsed = (seconds: number) => {
 const minutes = Math.floor(seconds / 60);
 const remainingSeconds = seconds % 60;
 
-```
 return `${minutes.toString().padStart(2, "0")}:${remainingSeconds
   .toString()
   .padStart(2, "0")}`;
-```
 
 };
 
@@ -263,13 +251,11 @@ if (currentStatus === "error") {
 return -1;
 }
 
-```
 if (currentStatus === "idle") {
   return -1;
 }
 
 return STATUS_INDEX[currentStatus];
-```
 
 };
 
@@ -302,7 +288,6 @@ className,
 return ( <section className={cardClasses}> <div className="rafta-conversion-header"> <div className="rafta-conversion-header-text"> <p className="rafta-conversion-eyebrow">
 RAFTA AI </p>
 
-```
       <h2 className="rafta-conversion-title">
         {title}
       </h2>
@@ -551,7 +536,7 @@ RAFTA AI </p>
       )}
   </div>
 </section>
-```
 
 );
 }
+

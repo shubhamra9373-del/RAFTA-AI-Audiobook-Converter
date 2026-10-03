@@ -90,7 +90,6 @@ Math.max(safeMin, value)
 const percentage = useMemo(() => {
 const range = safeMax - safeMin;
 
-```
 if (range <= 0) {
   return 0;
 }
@@ -103,7 +102,6 @@ return Math.min(
       100
   )
 );
-```
 
 }, [safeValue, safeMin, safeMax]);
 
@@ -117,11 +115,8 @@ return Math.min(
   return;
   }
 
-```
 let frame = 0;
-```
 
-```
 const animate = () => {
   setDisplayValue((current) => {
     const difference =
@@ -150,7 +145,6 @@ frame =
 return () => {
   window.cancelAnimationFrame(frame);
 };
-```
 
 }, [
 percentage,
@@ -219,7 +213,6 @@ endLabel) && ( <div className="rafta-progress-header"> <div className="rafta-pro
 {label} </span>
 )}
 
-```
         {startLabel && (
           <span className="rafta-progress-start-label">
             {startLabel}
@@ -303,7 +296,6 @@ endLabel) && ( <div className="rafta-progress-header"> <div className="rafta-pro
     </div>
   </div>
 </div>
-```
 
 );
 }
@@ -355,7 +347,6 @@ className={`rafta-upload-progress ${className}`.trim()}
 > <div className="rafta-upload-progress-top"> <div className="rafta-upload-progress-file"> <span className="rafta-upload-progress-icon">
 📄 </span>
 
-```
       <div>
         <strong>
           {fileName ||
@@ -378,7 +369,6 @@ className={`rafta-upload-progress ${className}`.trim()}
     showPercentage={false}
   />
 </div>
-```
 
 );
 }
@@ -404,7 +394,6 @@ className={`rafta-conversion-bar ${className}`.trim()}
 > <div className="rafta-conversion-bar-header"> <span>{status}</span> <strong>
 {Math.round(progress)}% </strong> </div>
 
-```
   <ProgressBar
     value={progress}
     size="medium"
@@ -413,7 +402,6 @@ className={`rafta-conversion-bar ${className}`.trim()}
     animated
   />
 </div>
-```
 
 );
 }
@@ -483,7 +471,6 @@ aria-label={`${Math.round(
        strokeWidth={strokeWidth}
      />
 
-```
     <circle
       className="rafta-circular-progress-fill"
       cx={center}
@@ -512,7 +499,7 @@ aria-label={`${Math.round(
     )}
   </div>
 </div>
-```
 
 );
 }
+

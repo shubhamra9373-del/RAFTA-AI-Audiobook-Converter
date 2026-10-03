@@ -31,11 +31,8 @@ useState(false);
   useEffect(() => {
   setMounted(true);
 
-```
 try {
-```
 
-```
   const savedTheme =
     localStorage.getItem(
       "rafta_theme"
@@ -71,7 +68,6 @@ try {
 
   applyTheme("dark");
 }
-```
 
 }, []);
 
@@ -83,11 +79,8 @@ try {
   const root =
   document.documentElement;
 
-```
 root.setAttribute(
-```
 
-```
   "data-theme",
   nextTheme
 );
@@ -103,7 +96,6 @@ root.classList.add(
 
 root.style.colorScheme =
   nextTheme;
-```
 
 };
 
@@ -117,11 +109,8 @@ root.style.colorScheme =
   ? "light"
   : "dark";
 
-```
 setTheme(nextTheme);
-```
 
-```
 try {
   localStorage.setItem(
     "rafta_theme",
@@ -146,7 +135,6 @@ window.dispatchEvent(
     }
   )
 );
-```
 
 };
 
@@ -166,7 +154,6 @@ disabled
 > <span className="rafta-theme-toggle-track"> <span className="rafta-theme-toggle-thumb">
 ◐ </span> </span>
 
-```
     {showLabel && (
       <span className="rafta-theme-toggle-label">
         Theme
@@ -174,7 +161,6 @@ disabled
     )}
   </button>
 );
-```
 
 }
 
@@ -208,7 +194,6 @@ isDark
 > <span className="rafta-theme-toggle-track"> <span className="rafta-theme-toggle-icons"> <span className="rafta-theme-icon-moon">
 ☾ </span>
 
-```
       <span className="rafta-theme-icon-sun">
         ☀
       </span>
@@ -227,7 +212,6 @@ isDark
     </span>
   )}
 </button>
-```
 
 );
 }
@@ -250,7 +234,6 @@ localStorage.getItem(
 "rafta_theme"
 );
 
-```
   if (
     savedTheme === "light" ||
     savedTheme === "dark"
@@ -275,7 +258,6 @@ localStorage.getItem(
 
   applyGlobalTheme("dark");
 }
-```
 
 }, []);
 
@@ -320,7 +302,6 @@ document.documentElement.getAttribute(
 "data-theme"
 );
 
-```
   if (
     currentTheme === "light" ||
     currentTheme === "dark"
@@ -342,7 +323,6 @@ return () => {
     updateTheme
   );
 };
-```
 
 }, []);
 
@@ -352,3 +332,4 @@ return ( <span className="rafta-theme-status">
 : "Light"} </span>
 );
 }
+

@@ -25,7 +25,17 @@ onTimeUpdate?: (currentTime: number) => void;
 
 type SleepOption = "off" | "5" | "10" | "15" | "30" | "45";
 
-const API_URL = "http://127.0.0.1:8000";
+const LOCAL_API_URL = "http://127.0.0.1:8000";
+const PUBLIC_API_URL =
+  "https://rafta-ai-audiobook-converter.onrender.com";
+
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "") ||
+  (typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1")
+    ? LOCAL_API_URL
+    : PUBLIC_API_URL);
 
 const SPEED_OPTIONS = [0.75, 1, 1.25, 1.5, 1.75, 2];
 
@@ -100,11 +110,8 @@ const [bufferedPercent, setBufferedPercent] = useState(0);
   const resolvedAudioUrl = useMemo(() => {
   if (!audioUrl) return "";
 
-```
 if (
-```
 
-```
   audioUrl.startsWith("http://") ||
   audioUrl.startsWith("https://") ||
   audioUrl.startsWith("blob:") ||
@@ -118,7 +125,6 @@ if (audioUrl.startsWith("/")) {
 }
 
 return `${API_URL}/${audioUrl}`;
-```
 
 }, [audioUrl]);
 
@@ -132,9 +138,7 @@ return `${API_URL}/${audioUrl}`;
   .replace(/[<>:"/\|?*\x00-\x1F]/g, "")
   .replace(/\s+/g, " ");
 
-```
 return `${cleaned || "rafta-audiobook"}.mp3`;
-```
 
 }, [title]);
 
@@ -150,11 +154,8 @@ return `${cleaned || "rafta-audiobook"}.mp3`;
   return "00:00";
   }
 
-```
 const totalSeconds = Math.floor(seconds);
-```
 
-```
 const hours = Math.floor(totalSeconds / 3600);
 const minutes = Math.floor((totalSeconds % 3600) / 60);
 const remainingSeconds = totalSeconds % 60;
@@ -171,7 +172,6 @@ return [
   minutes.toString().padStart(2, "0"),
   remainingSeconds.toString().padStart(2, "0"),
 ].join(":");
-```
 
 }, []);
 
@@ -182,11 +182,8 @@ return [
   useEffect(() => {
   mountedRef.current = true;
 
-```
 try {
-```
 
-```
   const storedFavorites =
     localStorage.getItem("rafta_audiobook_favorites");
 
@@ -214,7 +211,6 @@ return () => {
     sleepTimerRef.current = null;
   }
 };
-```
 
 }, [title]);
 
@@ -225,11 +221,8 @@ return () => {
   useEffect(() => {
   const audio = audioRef.current;
 
-```
 setIsPlaying(false);
-```
 
-```
 setCurrentTime(0);
 setDuration(0);
 setIsReady(false);
@@ -244,7 +237,6 @@ audio.currentTime = 0;
 audio.playbackRate = playbackRate;
 audio.volume = isMuted ? 0 : volume;
 audio.load();
-```
 
 }, [resolvedAudioUrl]);
 
@@ -256,9 +248,7 @@ audio.load();
   const audio = audioRef.current;
   if (!audio) return;
 
-```
 audio.volume = isMuted ? 0 : volume;
-```
 
 }, [volume, isMuted]);
 
@@ -270,9 +260,7 @@ audio.volume = isMuted ? 0 : volume;
   const audio = audioRef.current;
   if (!audio) return;
 
-```
 audio.playbackRate = playbackRate;
-```
 
 }, [playbackRate]);
 
@@ -291,11 +279,8 @@ audio.playbackRate = playbackRate;
   const updateBufferedProgress = useCallback(() => {
   const audio = audioRef.current;
 
-```
 if (!audio || !Number.isFinite(audio.duration)) {
-```
 
-```
   return;
 }
 
@@ -314,7 +299,6 @@ try {
 } catch {
   // Browser may throw when buffered ranges change.
 }
-```
 
 }, []);
 
@@ -325,11 +309,8 @@ try {
   const togglePlay = useCallback(async () => {
   const audio = audioRef.current;
 
-```
 if (!audio || !resolvedAudioUrl) {
-```
 
-```
   return;
 }
 
@@ -366,7 +347,6 @@ try {
     setHasError(true);
   }
 }
-```
 
 }, [resolvedAudioUrl, onPause, onPlay]);
 
@@ -424,16 +404,12 @@ try {
   ) => {
   const value = Number(event.target.value);
 
-```
 if (!Number.isFinite(value)) {
-```
 
-```
   return;
 }
 
 seekTo(value);
-```
 
 };
 
@@ -446,11 +422,8 @@ seekTo(value);
   ) => {
   const value = Number(event.target.value);
 
-```
 if (!Number.isFinite(value)) {
-```
 
-```
   return;
 }
 
@@ -464,7 +437,6 @@ if (nextVolume > 0) {
 } else {
   setIsMuted(true);
 }
-```
 
 };
 
@@ -475,11 +447,8 @@ if (nextVolume > 0) {
   const toggleMute = () => {
   const audio = audioRef.current;
 
-```
 if (!audio) {
-```
 
-```
   return;
 }
 
@@ -499,7 +468,6 @@ if (isMuted || audio.volume === 0) {
   setVolume(0);
   setIsMuted(true);
 }
-```
 
 };
 
@@ -512,18 +480,14 @@ if (isMuted || audio.volume === 0) {
   return;
   }
 
-```
 const audio = audioRef.current;
-```
 
-```
 if (audio) {
   audio.playbackRate = speed;
 }
 
 setPlaybackRate(speed);
 setShowSpeedMenu(false);
-```
 
 };
 
@@ -537,9 +501,7 @@ setShowSpeedMenu(false);
   sleepTimerRef.current = null;
   }
 
-```
 setSleepRemaining(null);
-```
 
 }, []);
 
@@ -606,11 +568,8 @@ setSleepRemaining(null);
   return;
   }
 
-```
 const interval = window.setInterval(() => {
-```
 
-```
   setSleepRemaining((current) => {
     if (current === null) {
       return null;
@@ -630,7 +589,6 @@ const interval = window.setInterval(() => {
 return () => {
   window.clearInterval(interval);
 };
-```
 
 }, [sleepOption]);
 
@@ -646,11 +604,8 @@ return () => {
   return "";
   }
 
-```
 const totalSeconds = Math.ceil(
-```
 
-```
   sleepRemaining / 1000
 );
 
@@ -660,7 +615,6 @@ const seconds = totalSeconds % 60;
 return `${minutes}:${seconds
   .toString()
   .padStart(2, "0")}`;
-```
 
 }, [sleepRemaining]);
 
@@ -755,16 +709,12 @@ return `${minutes}:${seconds
   setShareMessage("Share failed");
   }
 
-```
 window.setTimeout(() => {
-```
 
-```
   if (mountedRef.current) {
     setShareMessage("");
   }
 }, 2500);
-```
 
 };
 
@@ -780,11 +730,8 @@ window.setTimeout(() => {
   return;
   }
 
-```
 try {
-```
 
-```
   const response = await fetch(resolvedAudioUrl);
 
   if (!response.ok) {
@@ -825,7 +772,6 @@ try {
 }
 
 setShowMoreMenu(false);
-```
 
 };
 
@@ -836,11 +782,8 @@ setShowMoreMenu(false);
   const handleLoadedMetadata = () => {
   const audio = audioRef.current;
 
-```
 if (!audio) {
-```
 
-```
   return;
 }
 
@@ -879,7 +822,6 @@ if (autoPlay) {
       }
     });
 }
-```
 
 };
 
@@ -917,7 +859,6 @@ onEnded?.();
 const handleTimeUpdate = () => {
 const audio = audioRef.current;
 
-```
 if (!audio) {
   return;
 }
@@ -926,7 +867,6 @@ const time = audio.currentTime;
 
 setCurrentTime(time);
 updateBufferedProgress();
-```
 
 };
 
@@ -956,11 +896,8 @@ setHasError(true);
   ) => {
   const target = event.target as HTMLElement | null;
 
-```
 if (
-```
 
-```
   target?.tagName === "INPUT" ||
   target?.tagName === "SELECT" ||
   target?.tagName === "TEXTAREA"
@@ -1011,7 +948,6 @@ switch (event.key) {
   default:
     break;
 }
-```
 
 };
 
@@ -1073,7 +1009,6 @@ onProgress={handleProgress}
 onError={handleAudioError}
 />
 
-```
   <div className="audiobook-player-header">
     <div className="audiobook-player-cover-wrapper">
       {coverUrl ? (
@@ -1493,7 +1428,7 @@ onError={handleAudioError}
     </span>
   </div>
 </div>
-```
 
 );
 }
+

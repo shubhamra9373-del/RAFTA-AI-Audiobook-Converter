@@ -112,7 +112,6 @@ event: React.FormEvent<HTMLFormElement>
 ) => {
 event.preventDefault();
 
-```
 const form = event.currentTarget;
 const emailInput =
   form.elements.namedItem(
@@ -139,7 +138,6 @@ emailInput.value = "";
 window.alert(
   "Thank you for subscribing to RAFTA AI."
 );
-```
 
 };
 
@@ -153,7 +151,6 @@ className,
 
 return ( <footer className={footerClasses}> <div className="rafta-footer-glow rafta-footer-glow-one" /> <div className="rafta-footer-glow rafta-footer-glow-two" />
 
-```
   <div className="rafta-footer-container">
     {!compact && (
       <div className="rafta-footer-top">
@@ -414,7 +411,7 @@ return ( <footer className={footerClasses}> <div className="rafta-footer-glow ra
     </div>
   </div>
 </footer>
-```
 
 );
 }
+

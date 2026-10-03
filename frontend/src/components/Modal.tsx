@@ -96,11 +96,8 @@ null
   "rafta-modal-root"
   ) as HTMLDivElement | null;
 
-```
 if (existingRoot) {
-```
 
-```
   portalRootRef.current = existingRoot;
   return;
 }
@@ -118,7 +115,6 @@ return () => {
     root.parentNode.removeChild(root);
   }
 };
-```
 
 }, []);
 
@@ -131,11 +127,8 @@ return () => {
   return;
   }
 
-```
 const body = document.body;
-```
 
-```
 const html = document.documentElement;
 
 const previousBodyOverflow =
@@ -152,7 +145,6 @@ return () => {
   html.style.overflow =
     previousHtmlOverflow;
 };
-```
 
 }, [isOpen, preventBodyScroll]);
 
@@ -165,11 +157,8 @@ return () => {
   return;
   }
 
-```
 const handleKeyDown = (event: globalThis.KeyboardEvent) => {
-```
 
-```
   if (event.key === "Escape") {
     event.preventDefault();
     onClose();
@@ -187,7 +176,6 @@ return () => {
     handleKeyDown
   );
 };
-```
 
 }, [
 isOpen,
@@ -205,11 +193,8 @@ onClose,
   return;
   }
 
-```
 previousActiveElementRef.current =
-```
 
-```
   document.activeElement as HTMLElement | null;
 
 const focusTimer = window.setTimeout(() => {
@@ -236,7 +221,6 @@ return () => {
 
   previousActiveElementRef.current?.focus?.();
 };
-```
 
 }, [isOpen]);
 
@@ -249,11 +233,8 @@ return () => {
   return;
   }
 
-```
 const handleTabKey = (event: globalThis.KeyboardEvent) => {
-```
 
-```
   if (event.key !== "Tab") {
     return;
   }
@@ -312,7 +293,6 @@ return () => {
     handleTabKey
   );
 };
-```
 
 }, [isOpen]);
 
@@ -330,14 +310,10 @@ return () => {
   return;
   }
 
-```
 if (event.target === event.currentTarget) {
-```
 
-```
   onClose();
 }
-```
 
 };
 
@@ -444,7 +420,6 @@ onKeyDown={handleModalKeyDown}
 {header ? ( <div className="rafta-modal-header-custom">
 {header}
 
-```
           {showCloseButton &&
             !persistent && (
               <button
@@ -518,7 +493,6 @@ onKeyDown={handleModalKeyDown}
   </div>
 </div>,
 portalRootRef.current
-```
 
 );
 }
@@ -619,7 +593,6 @@ footer={ <ModalFooter> <button
        >
 {cancelText} </button>
 
-```
       <button
         type="button"
         className={`rafta-modal-button rafta-modal-button-${variant}`}
@@ -646,7 +619,6 @@ footer={ <ModalFooter> <button
     </p>
   </ModalBody>
 </Modal>
-```
 
 );
 }
@@ -729,7 +701,6 @@ closeOnEscape={false}
 persistent
 > <ModalBody> <div className="rafta-modal-loading"> <div className="rafta-modal-loading-spinner"> <span /> </div>
 
-```
       {hasProgress && (
         <div className="rafta-modal-loading-progress">
           <div className="rafta-modal-loading-progress-track">
@@ -749,7 +720,7 @@ persistent
     </div>
   </ModalBody>
 </Modal>
-```
 
 );
 }
+

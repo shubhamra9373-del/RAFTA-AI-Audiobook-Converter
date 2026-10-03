@@ -114,11 +114,8 @@ const text = isControlled
   return;
   }
 
-```
 const previousOverflow =
-```
 
-```
   document.body.style.overflow;
 
 document.body.style.overflow =
@@ -128,7 +125,6 @@ return () => {
   document.body.style.overflow =
     previousOverflow;
 };
-```
 
 }, [fullscreen]);
 
@@ -148,16 +144,12 @@ return () => {
   const wordCount = useMemo(() => {
   const trimmed = text.trim();
 
-```
 if (!trimmed) {
-```
 
-```
   return 0;
 }
 
 return trimmed.split(/\s+/).length;
-```
 
 }, [text]);
 
@@ -168,11 +160,8 @@ return trimmed.split(/\s+/).length;
   const paragraphCount = useMemo(() => {
   const trimmed = text.trim();
 
-```
 if (!trimmed) {
-```
 
-```
   return 0;
 }
 
@@ -180,7 +169,6 @@ return trimmed
   .split(/\n\s*\n/)
   .filter(Boolean)
   .length;
-```
 
 }, [text]);
 
@@ -196,9 +184,7 @@ return trimmed
   return 0;
   }
 
-```
 return wordCount / 150;
-```
 
 }, [wordCount]);
 
@@ -208,7 +194,6 @@ if (estimatedMinutes <= 0) {
 return "00:00";
 }
 
-```
   const totalSeconds = Math.round(
     estimatedMinutes * 60
   );
@@ -238,7 +223,6 @@ return "00:00";
     .toString()
     .padStart(2, "0")}`;
 }, [estimatedMinutes]);
-```
 
 /*
 
@@ -255,16 +239,12 @@ return "00:00";
   nextValue.slice(0, maxLength);
   }
 
-```
 if (!isControlled) {
-```
 
-```
   setInternalValue(nextValue);
 }
 
 onChange?.(nextValue);
-```
 
 };
 
@@ -288,16 +268,12 @@ onChange?.(nextValue);
   const pastedText =
   event.clipboardData.getData("text");
 
-```
 if (!pastedText) {
-```
 
-```
   return;
 }
 
 onPasteText?.(pastedText);
-```
 
 };
 
@@ -309,17 +285,13 @@ onPasteText?.(pastedText);
   const textarea =
   textareaRef.current;
 
-```
 if (!textarea) {
-```
 
-```
   return;
 }
 
 textarea.focus();
 textarea.select();
-```
 
 };
 
@@ -332,11 +304,8 @@ textarea.select();
   return;
   }
 
-```
 try {
-```
 
-```
   await navigator.clipboard.writeText(
     text
   );
@@ -352,7 +321,6 @@ try {
     error
   );
 }
-```
 
 };
 
@@ -380,13 +348,11 @@ try {
   "Clipboard is empty"
   );
 
-  ```
    window.setTimeout(() => {
      setPasteMessage("");
    }, 1800);
 
    return;
-  ```
 
   }
 
@@ -433,14 +399,12 @@ try {
   selectionStart +
   clipboardText.length;
 
-  ```
    textarea.focus();
 
    textarea.setSelectionRange(
      newCursorPosition,
      newCursorPosition
    );
-  ```
 
   }, 0);
   } catch (error) {
@@ -469,11 +433,8 @@ try {
   const textarea =
   textareaRef.current;
 
-```
 if (!textarea) {
-```
 
-```
   updateValue(
     `${text}${insertedText}`
   );
@@ -505,7 +466,6 @@ window.setTimeout(() => {
     cursorPosition
   );
 }, 0);
-```
 
 };
 
@@ -541,11 +501,8 @@ window.setTimeout(() => {
   return;
   }
 
-```
 /*
-```
 
-```
  * Tab inserts spaces rather than moving
  * focus away from the editor.
  */
@@ -554,7 +511,6 @@ if (event.key === "Tab") {
 
   insertText("  ");
 }
-```
 
 };
 
@@ -633,7 +589,6 @@ fullscreen
 > <div className="rafta-text-editor-header"> <div className="rafta-text-editor-heading"> <div className="rafta-text-editor-icon">
 ✎ </div>
 
-```
         <div>
           {label && (
             <span className="rafta-text-editor-label">
@@ -943,7 +898,6 @@ fullscreen
     />
   )}
 </>
-```
 
 );
 }
@@ -1013,3 +967,4 @@ No text available. </span>
 )} </div>
 );
 }
+

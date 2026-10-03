@@ -847,3 +847,4 @@ export function isLoggedIn():
     getCurrentUser() !== null
   );
 }
+

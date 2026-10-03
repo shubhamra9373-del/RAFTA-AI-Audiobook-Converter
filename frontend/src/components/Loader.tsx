@@ -69,7 +69,6 @@ aria-label={text || "Loading"}
 {showLogo && ( <div className="rafta-loader-logo"> <span className="rafta-loader-logo-mark">
 R </span>
 
-```
         <span className="rafta-loader-logo-text">
           RAFTA <strong>AI</strong>
         </span>
@@ -85,7 +84,6 @@ R </span>
     )}
   </div>
 </div>
-```
 
 );
 }
@@ -184,3 +182,4 @@ return ( <div
   />
   );
   }
+

@@ -64,11 +64,8 @@ useRef<HTMLInputElement | null>(null);
   setScrolled(window.scrollY > 10);
   };
 
-```
 handleScroll();
-```
 
-```
 window.addEventListener(
   "scroll",
   handleScroll,
@@ -81,7 +78,6 @@ return () => {
     handleScroll
   );
 };
-```
 
 }, []);
 
@@ -94,11 +90,8 @@ return () => {
   return;
   }
 
-```
 const previousOverflow =
-```
 
-```
   document.body.style.overflow;
 
 document.body.style.overflow = "hidden";
@@ -107,7 +100,6 @@ return () => {
   document.body.style.overflow =
     previousOverflow;
 };
-```
 
 }, [menuOpen]);
 
@@ -120,18 +112,14 @@ return () => {
   return;
   }
 
-```
 const timer = window.setTimeout(() => {
-```
 
-```
   searchInputRef.current?.focus();
 }, 50);
 
 return () => {
   window.clearTimeout(timer);
 };
-```
 
 }, [searchOpen]);
 
@@ -146,11 +134,8 @@ return () => {
   }
   };
 
-```
 window.addEventListener(
-```
 
-```
   "resize",
   handleResize
 );
@@ -161,7 +146,6 @@ return () => {
     handleResize
   );
 };
-```
 
 }, []);
 
@@ -174,11 +158,8 @@ return () => {
   ) => {
   event.preventDefault();
 
-```
 const query = searchQuery.trim();
-```
 
-```
 if (!query) {
   return;
 }
@@ -187,7 +168,6 @@ const encodedQuery =
   encodeURIComponent(query);
 
 window.location.href = `/library?search=${encodedQuery}`;
-```
 
 };
 
@@ -216,7 +196,6 @@ return (
 <> <header className={navbarClasses}> <div className="rafta-navbar-container">
 {/* Logo */}
 
-```
       <Link
         href="/"
         className="rafta-navbar-logo"
@@ -447,7 +426,7 @@ return (
     />
   )}
 </>
-```
 
 );
 }
+
